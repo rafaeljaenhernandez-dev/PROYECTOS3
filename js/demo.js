@@ -1,111 +1,214 @@
-// Demo en directo: mapa, lista, detalle del gimnasio y pasos por los tornos
+// Demo en directo: mapa por barrios, aforo exacto de cada gimnasio y pasos por los tornos
 
-let seleccionado = GIMNASIOS[0].id;
-const marcadores = {};      // id -> marcador de Leaflet
-const filas = {};           // id -> <li> de la lista
-let pendiente = false;      // para no repintar más de una vez por fotograma
+const ZOOM_GIMNASIOS = 15;   // a partir de este zoom el mapa enseña cada gimnasio
+
+let barrioElegido = BARRIOS[0].id;
+let gimnasioElegido = gimnasiosDe(barrioElegido)[0].id;
+let mapa = null;
+const marcadoresBarrio = {};    // id del barrio -> marcador
+const marcadoresGimnasio = {};  // id del gimnasio -> marcador
+let capaBarrios = null;
+let capaGimnasios = null;
+let pendiente = false;          // para no repintar más de una vez por fotograma
+
+// ---------- Cálculos ----------
+function datosGimnasio(g) {
+  const dentro = estadoTornos[g.id].dentro;
+  const p = porcentaje(dentro, g.capacidad);
+  return { dentro, p, s: semaforo(p) };
+}
+
+// El porcentaje de un barrio es la gente de todos sus gimnasios entre su aforo total
+function datosBarrio(b) {
+  let dentro = 0;
+  let capacidad = 0;
+  for (const g of gimnasiosDe(b.id)) {
+    dentro += estadoTornos[g.id].dentro;
+    capacidad += g.capacidad;
+  }
+  const p = porcentaje(dentro, capacidad);
+  return { dentro, capacidad, p, s: semaforo(p) };
+}
 
 // ---------- Mapa ----------
 function iniciarMapa() {
   const contenedor = document.getElementById("mapa");
   if (typeof L === "undefined") {
     contenedor.classList.add("mapa-sin-conexion");
-    contenedor.textContent = "El mapa necesita conexión a internet. La lista de al lado sigue en directo.";
+    contenedor.textContent = "El mapa necesita conexión a internet. Los barrios y gimnasios de al lado siguen en directo.";
     return;
   }
-  const mapa = L.map(contenedor, { scrollWheelZoom: false, zoomControl: true }).setView([40.425, -3.695], 13);
+  mapa = L.map(contenedor, { scrollWheelZoom: false }).setView([40.43, -3.695], 13);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 19,
   }).addTo(mapa);
 
-  for (const g of GIMNASIOS) {
-    const icono = L.divIcon({ className: "pin-caja", html: '<button class="pin"><span></span></button>', iconSize: [52, 52], iconAnchor: [26, 26] });
-    const marcador = L.marker([g.lat, g.lng], { icon: icono, keyboard: false, title: nombreCompleto(g) }).addTo(mapa);
-    marcador.on("click", () => seleccionar(g.id));
-    marcadores[g.id] = marcador;
-  }
-  const limites = L.latLngBounds(GIMNASIOS.map((g) => [g.lat, g.lng]));
-  mapa.fitBounds(limites, { padding: [28, 28] });
-}
+  capaBarrios = L.layerGroup().addTo(mapa);
+  capaGimnasios = L.layerGroup();
 
-// ---------- Lista ----------
-function iniciarLista() {
-  const lista = document.getElementById("demo-lista");
-  for (const g of GIMNASIOS) {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <button class="fila" data-id="${g.id}">
-        <span class="punto"></span>
-        <span class="fila-nombre">${g.nombre} <small>${g.barrio}</small></span>
-        <span class="fila-cifra"></span>
-        <span class="mini-medidor"><span></span></span>
-      </button>`;
-    lista.appendChild(li);
-    filas[g.id] = li;
+  for (const b of BARRIOS) {
+    const icono = L.divIcon({ className: "pin-caja", html: `<button class="pin-barrio"><b></b><span>${b.nombre}</span></button>`, iconSize: [96, 84], iconAnchor: [48, 32] });
+    const m = L.marker([b.lat, b.lng], { icon: icono, keyboard: false, title: b.nombre }).addTo(capaBarrios);
+    m.on("click", () => elegirBarrio(b.id, true));
+    marcadoresBarrio[b.id] = m;
   }
-  lista.addEventListener("click", (e) => {
-    const boton = e.target.closest(".fila");
-    if (boton) seleccionar(boton.dataset.id);
+  for (const g of GIMNASIOS) {
+    const icono = L.divIcon({ className: "pin-caja", html: '<button class="pin-gim"><b></b><span></span></button>', iconSize: [76, 30], iconAnchor: [38, 15] });
+    const m = L.marker([g.lat, g.lng], { icon: icono, keyboard: false, title: g.nombre }).addTo(capaGimnasios);
+    m.on("click", () => elegirGimnasio(g.id));
+    marcadoresGimnasio[g.id] = m;
+  }
+
+  verTodoMadrid();
+  // Lejos se ven los barrios; cerca, cada gimnasio
+  mapa.on("zoomend", () => {
+    const cerca = mapa.getZoom() >= ZOOM_GIMNASIOS;
+    if (cerca) { mapa.removeLayer(capaBarrios); capaGimnasios.addTo(mapa); }
+    else { mapa.removeLayer(capaGimnasios); capaBarrios.addTo(mapa); }
+    document.getElementById("ver-todo").hidden = !cerca;
+    pintar();
   });
+  document.getElementById("ver-todo").addEventListener("click", verTodoMadrid);
 }
 
-function seleccionar(id) {
-  seleccionado = id;
+function verTodoMadrid() {
+  if (!mapa) return;
+  mapa.fitBounds(L.latLngBounds(BARRIOS.map((b) => [b.lat, b.lng])), { padding: [48, 48] });
+}
+
+// ---------- Elegir barrio y gimnasio ----------
+function elegirBarrio(id, acercar) {
+  barrioElegido = id;
+  const enBarrio = gimnasiosDe(id);
+  if (!enBarrio.some((g) => g.id === gimnasioElegido)) gimnasioElegido = enBarrio[0].id;
+  if (acercar && mapa) {
+    const b = BARRIOS.find((x) => x.id === id);
+    mapa.flyTo([b.lat + 0.0008, b.lng + 0.0006], ZOOM_GIMNASIOS + 0.4, { duration: 0.8 });
+  }
   pintarGrafica();
   pintar();
 }
 
-// ---------- Pintar ----------
-function datosDe(g) {
-  const dentro = estadoTornos[g.id].dentro;
-  const p = porcentaje(dentro, g.capacidad);
-  return { dentro, p, s: semaforo(p) };
+function elegirGimnasio(id) {
+  gimnasioElegido = id;
+  barrioElegido = GIMNASIOS.find((g) => g.id === id).barrio;
+  pintarGrafica();
+  pintar();
 }
 
+// ---------- Listas ----------
+function iniciarListas() {
+  const barrios = document.getElementById("barrios");
+  for (const b of BARRIOS) {
+    barrios.innerHTML += `
+      <li><button class="chip-barrio" data-id="${b.id}">
+        <span class="punto"></span><span class="chip-nombre">${b.nombre}</span><span class="chip-cifra"></span>
+      </button></li>`;
+  }
+  barrios.addEventListener("click", (e) => {
+    const boton = e.target.closest(".chip-barrio");
+    if (boton) elegirBarrio(boton.dataset.id, true);
+  });
+
+  document.getElementById("b-gimnasios").addEventListener("click", (e) => {
+    const boton = e.target.closest(".fila-gim");
+    if (boton) elegirGimnasio(boton.dataset.id);
+  });
+}
+
+// ---------- Pintar ----------
 function pintar() {
   pendiente = false;
   const hora = horaActual();
   const abierto = estaAbierto(hora);
 
-  // Lista ordenada de menos a más lleno
-  const ordenados = [...GIMNASIOS].sort((a, b) => datosDe(a).p - datosDe(b).p);
-  const lista = document.getElementById("demo-lista");
-  ordenados.forEach((g) => {
-    const { dentro, p, s } = datosDe(g);
-    const li = filas[g.id];
-    const boton = li.firstElementChild;
-    boton.className = `fila ${s.color}`;
-    boton.setAttribute("aria-pressed", g.id === seleccionado);
-    boton.setAttribute("aria-label", `${nombreCompleto(g)}: ${abierto ? s.texto : "Cerrado"}, ${dentro} de ${g.capacidad} personas`);
-    li.querySelector(".fila-cifra").textContent = abierto ? `${p} %` : "Cerrado";
-    li.querySelector(".mini-medidor span").style.transform = `scaleX(${p / 100})`;
-    lista.appendChild(li); // mover al final según el orden
-  });
-
-  // Marcadores del mapa
-  for (const g of GIMNASIOS) {
-    const marcador = marcadores[g.id];
-    if (!marcador || !marcador.getElement()) continue;
-    const { p, s } = datosDe(g);
-    const pin = marcador.getElement().querySelector(".pin");
-    pin.className = `pin ${abierto ? s.color : "cerrado"}${g.id === seleccionado ? " elegido" : ""}`;
-    pin.firstElementChild.textContent = abierto ? `${p}%` : "—";
-    marcador.setZIndexOffset(g.id === seleccionado ? 1000 : 0);
-  }
-
+  pintarBarriosMapa(abierto);
+  pintarGimnasiosMapa(abierto);
+  pintarChips(abierto);
+  pintarBarrio(abierto);
   pintarDetalle(hora, abierto);
-  pintarPortada(hora, abierto);
+  pintarPortada(hora);
+}
+
+function pintarBarriosMapa(abierto) {
+  for (const b of BARRIOS) {
+    const m = marcadoresBarrio[b.id];
+    if (!m || !m.getElement()) continue;
+    const { p, s } = datosBarrio(b);
+    const pin = m.getElement().querySelector(".pin-barrio");
+    pin.className = `pin-barrio ${abierto ? s.color : "cerrado"}${b.id === barrioElegido ? " elegido" : ""}`;
+    pin.querySelector("b").textContent = abierto ? `${p}%` : "—";
+  }
+}
+
+function pintarGimnasiosMapa(abierto) {
+  for (const g of GIMNASIOS) {
+    const m = marcadoresGimnasio[g.id];
+    if (!m || !m.getElement()) continue;
+    const { dentro, s } = datosGimnasio(g);
+    const pin = m.getElement().querySelector(".pin-gim");
+    pin.className = `pin-gim ${abierto ? s.color : "cerrado"}${g.id === gimnasioElegido ? " elegido" : ""}`;
+    pin.querySelector("b").textContent = dentro;
+    pin.querySelector("span").textContent = `/${g.capacidad}`;
+    m.setZIndexOffset(g.id === gimnasioElegido ? 1000 : 0);
+  }
+}
+
+function pintarChips(abierto) {
+  for (const boton of document.querySelectorAll(".chip-barrio")) {
+    const b = BARRIOS.find((x) => x.id === boton.dataset.id);
+    const { p, s } = datosBarrio(b);
+    boton.className = `chip-barrio ${abierto ? s.color : ""}`;
+    boton.setAttribute("aria-pressed", b.id === barrioElegido);
+    boton.querySelector(".chip-cifra").textContent = abierto ? `${p} %` : "Cerrado";
+  }
+}
+
+function pintarBarrio(abierto) {
+  const b = BARRIOS.find((x) => x.id === barrioElegido);
+  const { dentro, capacidad, p, s } = datosBarrio(b);
+  const gimnasios = gimnasiosDe(b.id);
+
+  document.getElementById("barrio-caja").className = `barrio-caja ${abierto ? s.color : "cerrado"}`;
+  document.getElementById("b-nombre").textContent = b.nombre;
+  document.getElementById("b-resumen").textContent = `${gimnasios.length} gimnasios · ${dentro} de ${capacidad} personas`;
+  document.getElementById("b-porcentaje").textContent = abierto ? `${p} %` : "Cerrado";
+  document.getElementById("b-relleno").style.transform = `scaleX(${p / 100})`;
+
+  // Una fila por gimnasio, de menos a más lleno, con su aforo exacto
+  const lista = document.getElementById("b-gimnasios");
+  const ordenados = [...gimnasios].sort((a, c) => datosGimnasio(a).p - datosGimnasio(c).p);
+  const ids = ordenados.map((g) => g.id).join();
+  if (lista.dataset.ids !== ids) {
+    lista.dataset.ids = ids;
+    lista.innerHTML = ordenados.map((g) => `
+      <li><button class="fila-gim" data-id="${g.id}">
+        <span class="punto"></span>
+        <span class="fila-texto"><span class="fila-nombre">${g.nombre}</span><small>${g.direccion}</small></span>
+        <span class="fila-aforo"><b></b>/${g.capacidad}</span>
+        <span class="mini-medidor"><span></span></span>
+      </button></li>`).join("");
+  }
+  for (const boton of lista.querySelectorAll(".fila-gim")) {
+    const g = GIMNASIOS.find((x) => x.id === boton.dataset.id);
+    const { dentro, p, s } = datosGimnasio(g);
+    boton.className = `fila-gim ${abierto ? s.color : ""}`;
+    boton.setAttribute("aria-pressed", g.id === gimnasioElegido);
+    boton.setAttribute("aria-label", `${g.nombre}: ${dentro} de ${g.capacidad} personas, ${p} %`);
+    boton.querySelector(".fila-aforo b").textContent = dentro;
+    boton.querySelector(".mini-medidor span").style.transform = `scaleX(${p / 100})`;
+  }
 }
 
 function pintarDetalle(hora, abierto) {
-  const g = GIMNASIOS.find((x) => x.id === seleccionado);
-  const { dentro, p, s } = datosDe(g);
+  const g = GIMNASIOS.find((x) => x.id === gimnasioElegido);
+  const { dentro, p, s } = datosGimnasio(g);
   const e = estadoTornos[g.id];
 
   document.getElementById("detalle").className = `detalle ${abierto ? s.color : "cerrado"}`;
-  document.getElementById("d-nombre").textContent = nombreCompleto(g);
-  document.getElementById("d-direccion").textContent = g.direccion;
+  document.getElementById("d-nombre").textContent = g.nombre;
+  document.getElementById("d-direccion").textContent = `${g.direccion} · ${barrioDe(g).nombre}`;
   const estado = document.getElementById("d-estado");
   estado.querySelector(".punto").className = `punto ${s.color}`;
   estado.lastElementChild.textContent = abierto ? s.texto : "Cerrado";
@@ -127,12 +230,10 @@ function pintarDetalle(hora, abierto) {
   document.getElementById("d-pico").textContent = formatoHora(pico);
   document.getElementById("d-tornos").textContent = `${g.tornos} de ${g.tornos}`;
 
-  const listaTornos = document.getElementById("d-lista-tornos");
-  listaTornos.innerHTML = "";
-  e.ultimoPaso.forEach((marca, i) => {
+  document.getElementById("d-lista-tornos").innerHTML = e.ultimoPaso.map((marca, i) => {
     const segundos = Math.max(0, Math.round((Date.now() - marca) / 1000));
-    listaTornos.innerHTML += `<li><span class="latido" aria-hidden="true"></span>Torno ${i + 1}<span>último paso hace ${segundos} s</span></li>`;
-  });
+    return `<li><span class="latido" aria-hidden="true"></span>Torno ${i + 1}<span>último paso hace ${segundos} s</span></li>`;
+  }).join("");
 
   // Marcar la hora actual en la gráfica
   document.querySelectorAll("#d-grafica .barra").forEach((barra) => {
@@ -144,7 +245,7 @@ function pintarDetalle(hora, abierto) {
 
 // Gráfica de previsión: una barra por hora, coloreada según el semáforo
 function pintarGrafica() {
-  const g = GIMNASIOS.find((x) => x.id === seleccionado);
+  const g = GIMNASIOS.find((x) => x.id === gimnasioElegido);
   const grafica = document.getElementById("d-grafica");
   grafica.innerHTML = "";
   for (let h = HORA_APERTURA; h < HORA_CIERRE; h++) {
@@ -179,38 +280,30 @@ function iniciarTooltip() {
 }
 
 // ---------- Portada ----------
-function pintarPortada(hora, abierto) {
+function pintarPortada(hora) {
   let total = 0;
   for (const g of GIMNASIOS) total += estadoTornos[g.id].dentro;
   document.getElementById("portada-total").textContent = total.toLocaleString("es-ES");
+  document.getElementById("portada-gimnasios").textContent = GIMNASIOS.length;
   document.getElementById("portada-reloj").textContent = formatoHora(hora);
-
-  const lista = document.getElementById("portada-lista");
-  if (!lista.children.length) {
-    for (const g of GIMNASIOS.slice(0, 4)) {
-      lista.innerHTML += `<li data-id="${g.id}"><span class="punto"></span><span class="pantalla-nombre">${g.nombre} <small>${g.barrio}</small></span><span class="pantalla-cifra"></span></li>`;
-    }
-  }
-  for (const li of lista.children) {
-    const g = GIMNASIOS.find((x) => x.id === li.dataset.id);
-    const { dentro, s } = datosDe(g);
-    li.querySelector(".punto").className = `punto ${abierto ? s.color : ""}`;
-    li.querySelector(".pantalla-cifra").textContent = abierto ? `${dentro}/${g.capacidad}` : "Cerrado";
-  }
 }
 
 // ---------- Pasos por los tornos ----------
+let ultimoApunte = 0;
 function anotarPaso(paso) {
+  document.getElementById("portada-paso").innerHTML =
+    `<b>${paso.tipo === "entrada" ? "+1" : "−1"}</b> ${paso.gimnasio.nombre} · ${barrioDe(paso.gimnasio).nombre}, torno ${paso.torno}`;
+
+  // En la lista apuntamos como mucho un paso cada 400 ms para que se pueda leer
+  if (Date.now() - ultimoApunte < 400) return;
+  ultimoApunte = Date.now();
   const feed = document.getElementById("feed");
   const li = document.createElement("li");
   li.className = `paso-${paso.tipo}`;
   const reloj = new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-  li.innerHTML = `<time>${reloj}</time><span class="paso-tipo">${paso.tipo === "entrada" ? "Entra" : "Sale"}</span><span>${nombreCompleto(paso.gimnasio)} · torno ${paso.torno}</span><span class="paso-dentro">${paso.dentro} dentro</span>`;
+  li.innerHTML = `<time>${reloj}</time><span class="paso-tipo">${paso.tipo === "entrada" ? "Entra" : "Sale"}</span><span>${paso.gimnasio.nombre} · ${barrioDe(paso.gimnasio).nombre} · torno ${paso.torno}</span><span class="paso-dentro">${paso.dentro}/${paso.gimnasio.capacidad}</span>`;
   feed.prepend(li);
   while (feed.children.length > 7) feed.lastElementChild.remove();
-
-  document.getElementById("portada-paso").innerHTML =
-    `<b>${paso.tipo === "entrada" ? "+1" : "−1"}</b> ${nombreCompleto(paso.gimnasio)}, torno ${paso.torno}`;
 }
 
 // ---------- Selector de hora ----------
@@ -228,7 +321,7 @@ function iniciarHoras() {
 // ---------- Arranque ----------
 iniciarTornos();
 iniciarMapa();
-iniciarLista();
+iniciarListas();
 iniciarTooltip();
 iniciarHoras();
 pintarGrafica();

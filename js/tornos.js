@@ -94,5 +94,5 @@ function fijarHora(hora) {
 
 function iniciarTornos() {
   sembrarTornos();
-  setInterval(pasoPorTorno, 450);
+  setInterval(pasoPorTorno, 250);
 }

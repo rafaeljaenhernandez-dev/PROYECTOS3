@@ -6,25 +6,24 @@ Esto es una demo de cómo funcionaría, no el producto final. Los tornos y los g
 
 ## Qué enseña la web
 
-1. **Portada**: nombre, logo, eslogan y un contador en directo.
+1. **Portada**: nombre, logo, eslogan y un Madrid en 3D donde cada gimnasio es una columna que sube y baja con la gente que hay dentro.
 2. **Problema**: situación actual, ideal y necesidad, cifras del sector con fuente y a quién le duele.
 3. **Solución**: cómo viaja el dato del torno al móvil y por qué así (preciso, sin trabajo extra, respeta el RGPD).
-4. **Demo en directo**: mapa de Madrid con el semáforo de cada gimnasio, previsión por horas, lo que ve el gimnasio y los pasos por los tornos en tiempo real. Se puede ver cómo estaría a otra hora (8:00, 14:30, 19:00...).
+4. **Demo en directo**: mapa de Madrid con el porcentaje de cada barrio. Al entrar en un barrio se ve el aforo exacto de cada uno de sus gimnasios, y al elegir un gimnasio, su previsión por horas y lo que ve el propio gimnasio. Debajo, los pasos por los tornos en tiempo real. Se puede ver cómo estaría a otra hora (8:00, 14:30, 19:00...).
 5. **Beneficios** para el usuario y para el gimnasio.
 6. **Mercado**: tamaño de mercado, curva de valor, competidores y DAFO.
 7. **Criterios de éxito** medibles por sprint.
-8. **Equipo**, roles y bloque de cada uno.
-9. **Plan** de los 3 sprints y metodología (fuentes y herramientas).
-10. **Cierre** con llamada a la acción y **fuentes**.
+8. **Cierre** con llamada a la acción y **fuentes**.
 
 ## Cómo está hecha
 
-HTML, CSS y JavaScript sin frameworks. El mapa usa [Leaflet](https://leafletjs.com) con mapas de OpenStreetMap.
+HTML, CSS y JavaScript sin frameworks. El mapa usa [Leaflet](https://leafletjs.com) con mapas de OpenStreetMap, y la portada usa [three.js](https://threejs.org).
 
-- `js/datos.js`: gimnasios de ejemplo, curvas de ocupación por hora y semáforo (verde < 50 %, amarillo 50-79 %, rojo ≥ 80 %).
+- `js/datos.js`: 7 barrios y 31 gimnasios de ejemplo, curvas de ocupación por hora y semáforo (verde < 50 %, amarillo 50-79 %, rojo ≥ 80 %).
 - `js/tornos.js`: simulador de tornos. En la versión real, estos pasos llegarían del control de accesos del gimnasio.
-- `js/demo.js`: mapa, lista, detalle del gimnasio y pasos en directo.
-- `js/web.js`: equipo, curva de valor y animaciones al hacer scroll.
+- `js/demo.js`: mapa por barrios, aforo de cada gimnasio, detalle y pasos en directo.
+- `js/escena3d.js`: el Madrid en 3D de la portada.
+- `js/web.js`: curva de valor, menú y animaciones al hacer scroll.
 
 ## Cómo arrancarla
 

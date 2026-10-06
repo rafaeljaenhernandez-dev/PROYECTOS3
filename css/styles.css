@@ -202,44 +202,7 @@ img { display: block; }
 }
 .portada-acciones { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
 
-/* Pantalla en directo de la portada */
-.pantalla {
-  position: relative;
-  padding: 24px;
-  border-radius: 28px;
-  background: var(--noche-2);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), var(--sombra-noche);
-  transform: rotate(1.5deg);
-}
-.pantalla-cabecera {
-  display: flex;
-  justify-content: space-between;
-  font: 500 0.8125rem/1 var(--fuente-datos);
-  color: var(--texto-noche-2);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.pantalla-reloj { color: var(--verde-luz); }
-.pantalla-total { margin: 18px 0 20px; color: var(--texto-noche-2); font-size: 1rem; }
-.pantalla-total strong {
-  display: block;
-  font: 700 clamp(3rem, 6vw, 4.5rem)/1 var(--fuente-datos);
-  letter-spacing: -0.04em;
-  color: var(--texto-noche);
-  font-variant-numeric: tabular-nums;
-}
-.pantalla-lista { list-style: none; margin: 0; padding: 0; }
-.pantalla-lista li {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid var(--noche-linea);
-}
-.pantalla-nombre { font-weight: 600; }
-.pantalla-nombre small { color: var(--texto-noche-2); font-weight: 400; font-size: 0.875rem; }
-.pantalla-cifra { font: 500 0.9375rem/1 var(--fuente-datos); font-variant-numeric: tabular-nums; }
+.pantalla-reloj { color: var(--verde-luz); font-family: var(--fuente-datos); }
 .pantalla-paso {
   margin: 14px 0 0;
   padding: 12px 14px;
@@ -266,9 +229,6 @@ img { display: block; }
 .punto.verde { background: var(--verde); }
 .punto.amarillo { background: var(--amarillo); }
 .punto.rojo { background: var(--rojo); }
-.pantalla .punto.verde { background: var(--verde-luz); }
-.pantalla .punto.amarillo { background: var(--amarillo-luz); }
-.pantalla .punto.rojo { background: var(--rojo-luz); }
 
 /* ---------- Secciones ---------- */
 .seccion { padding: clamp(72px, 10vw, 128px) var(--gutter); }
@@ -330,7 +290,7 @@ img { display: block; }
 .cifra span { display: block; margin-top: 10px; color: var(--tinta-2); font-size: 0.9375rem; }
 
 .clientes { margin-top: clamp(48px, 7vw, 80px); }
-.clientes h3, .metodo h3 { font-size: 1.5rem; letter-spacing: -0.02em; margin-bottom: 16px; }
+.clientes h3 { font-size: 1.5rem; letter-spacing: -0.02em; margin-bottom: 16px; }
 
 /* ---------- Tablas ---------- */
 .tabla {
@@ -480,67 +440,6 @@ img { display: block; }
 }
 .mapa { min-height: 460px; background: #e9ece8; z-index: 0; }
 .mapa-sin-conexion { display: grid; place-items: center; padding: 24px; color: var(--tinta-2); text-align: center; }
-
-/* Marcadores del mapa */
-.pin-caja { background: none; border: 0; }
-.pin {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  padding: 0;
-  border-radius: 50%;
-  border: 3px solid #fff;
-  background: var(--tinta-2);
-  color: #fff;
-  font: 700 0.8125rem/1 var(--fuente-datos);
-  box-shadow: 0 2px 4px rgb(0 0 0 / 0.2), 0 8px 18px rgb(0 0 0 / 0.18);
-  cursor: pointer;
-  transition: transform 200ms var(--ease-out), background-color 300ms ease;
-}
-.pin.verde { background: var(--verde); }
-.pin.amarillo { background: var(--amarillo); color: var(--noche); }
-.pin.rojo { background: var(--rojo); }
-.pin.elegido { transform: scale(1.22); border-color: var(--noche); }
-.pin:active { transform: scale(0.95); }
-
-/* Lista de gimnasios */
-.demo-lista {
-  list-style: none;
-  margin: 0;
-  padding: 8px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-}
-.fila {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 6px 10px;
-  width: 100%;
-  padding: 10px 12px;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  color: var(--texto-noche);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 150ms ease, transform 160ms var(--ease-out);
-}
-.fila:active { transform: scale(0.98); }
-.fila[aria-pressed="true"] { background: var(--noche-3); }
-@media (hover: hover) and (pointer: fine) { .fila:hover { background: var(--noche-3); } }
-.fila-nombre { font-weight: 600; font-size: 0.9375rem; }
-.fila-nombre small { color: var(--texto-noche-2); font-weight: 400; }
-.fila-cifra { font: 500 0.875rem/1 var(--fuente-datos); font-variant-numeric: tabular-nums; }
-.mini-medidor { grid-column: 2 / -1; height: 4px; border-radius: 999px; background: var(--noche-linea); overflow: hidden; }
-.mini-medidor span { display: block; height: 100%; transform-origin: left; background: var(--texto-noche-2); transition: transform 500ms var(--ease-out), background-color 300ms ease; }
-.fila .punto { background: var(--texto-noche-2); }
-.fila.verde .mini-medidor span, .fila.verde .punto { background: var(--verde-luz); }
-.fila.amarillo .mini-medidor span, .fila.amarillo .punto { background: var(--amarillo-luz); }
-.fila.rojo .mini-medidor span, .fila.rojo .punto { background: var(--rojo-luz); }
 
 /* Detalle del gimnasio (tarjeta clara sobre la noche) */
 .detalle {
@@ -708,35 +607,6 @@ img { display: block; }
 .dafo-celda ul { margin: 12px 0 0; padding-left: 18px; color: var(--tinta-2); }
 .dafo-celda li + li { margin-top: 6px; }
 
-/* ---------- Equipo ---------- */
-.equipo { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; border-radius: var(--radio); overflow: hidden; background: var(--linea); }
-.equipo li { display: flex; gap: 16px; padding: 28px 24px; background: var(--superficie); }
-.avatar {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  flex: none;
-  border-radius: 16px;
-  background: var(--noche);
-  color: var(--verde-luz);
-  font: 700 1rem/1 var(--fuente-datos);
-}
-.equipo h3 { font-size: 1.25rem; letter-spacing: -0.02em; }
-.equipo-rol { margin: 4px 0 0; color: var(--tinta-2); font-size: 0.9375rem; }
-.equipo-rol b { color: var(--verde-texto); }
-.equipo-bloque { margin: 10px 0 0; font-size: 0.875rem; font-family: var(--fuente-datos); color: var(--tinta); }
-
-/* ---------- Plan ---------- */
-.linea-tiempo { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px solid var(--tinta); }
-.linea-tiempo li { position: relative; padding: 32px 28px 0 0; }
-.linea-tiempo li::before { content: ""; position: absolute; top: -8px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--papel); border: 2px solid var(--tinta); }
-.linea-tiempo li:first-child::before { background: var(--verde); border-color: var(--verde); }
-.linea-tiempo time { font: 700 0.9375rem/1 var(--fuente-datos); color: var(--verde-texto); }
-.linea-tiempo h3 { margin-top: 10px; font-size: 1.5rem; letter-spacing: -0.025em; }
-.linea-tiempo p { margin: 8px 0 0; color: var(--tinta-2); }
-.metodo { margin-top: clamp(48px, 7vw, 80px); }
-
 /* ---------- Cierre ---------- */
 .cierre {
   display: grid;
@@ -772,24 +642,18 @@ img { display: block; }
   .nav { display: none; }
   .cabecera .boton-pequeno { margin-left: auto; }
   .portada { grid-template-columns: 1fr; }
-  .pantalla { transform: none; max-width: 520px; }
   .demo { grid-template-columns: 1fr; }
   .flujo { grid-template-columns: repeat(2, 1fr); }
   .flujo li::after, .flujo li::before { display: none; }
   .competencia { grid-template-columns: 1fr; }
-  .equipo { grid-template-columns: repeat(2, 1fr); }
   .cifras { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
-  .tres-tiempos, .porque, .beneficios, .dafo, .equipo, .linea-tiempo { grid-template-columns: 1fr; }
+  .tres-tiempos, .porque, .beneficios, .dafo { grid-template-columns: 1fr; }
   .tres-tiempos > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--linea); }
   .flujo { grid-template-columns: 1fr; }
   .porque { gap: 24px; }
-  .demo-lista { grid-template-columns: 1fr; }
-  .linea-tiempo { border-top: 0; border-left: 2px solid var(--tinta); padding-left: 24px; }
-  .linea-tiempo li { padding: 0 0 28px; }
-  .linea-tiempo li::before { top: 2px; left: -33px; }
   .embudo-nivel { grid-template-columns: 1fr; padding: 18px 20px; }
   .embudo-nivel:nth-child(2), .embudo-nivel:nth-child(3) { margin-right: 0; }
   .feed li { grid-template-columns: 64px 40px 1fr; }
@@ -809,8 +673,225 @@ img { display: block; }
   .latido::after, .flujo.visible li::before, .semaforo-grande span { animation: none; }
   .semaforo-grande span { opacity: 1; }
   .feed li:first-child { animation: none; }
-  .pin, .boton, .hora, .fila { transition-property: background-color, color; }
+  .pin-barrio, .pin-gim, .boton, .hora, .fila-gim, .chip-barrio { transition-property: background-color, color; }
 }
 
 /* Mapa en gris para que manden los colores del semáforo */
 .leaflet-tile-pane { filter: grayscale(1) contrast(0.92) brightness(1.04); }
+
+/* ---------- Portada 3D ---------- */
+.portada { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); padding-bottom: clamp(48px, 7vw, 96px); }
+.escena {
+  position: relative;
+  height: clamp(420px, 62vh, 640px);
+  margin-right: calc(var(--gutter) * -1);
+  cursor: grab;
+  touch-action: pan-y;
+}
+.escena canvas { display: block; width: 100%; height: 100%; }
+.escena-datos {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 0;
+  width: min(360px, 90%);
+  padding: 18px 20px;
+  border-radius: var(--radio);
+  background: rgb(20 32 25 / 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), var(--sombra-noche);
+}
+.escena-total { margin: 0; color: var(--texto-noche-2); font-size: 0.9375rem; }
+.escena-total strong {
+  display: block;
+  font: 700 clamp(2.5rem, 4.5vw, 3.5rem)/1 var(--fuente-datos);
+  letter-spacing: -0.04em;
+  color: var(--texto-noche);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+.escena-datos .pantalla-paso { margin-top: 12px; }
+.escena-pie {
+  position: absolute;
+  right: var(--gutter);
+  top: 0;
+  margin: 0;
+  max-width: 30ch;
+  text-align: right;
+  color: var(--texto-noche-2);
+  font-size: 0.8125rem;
+}
+.escena-pie .pantalla-reloj { display: block; font-size: 1.125rem; margin-bottom: 4px; }
+.escena.sin-3d { display: grid; align-items: end; }
+.escena.sin-3d canvas { display: none; }
+.escena.sin-3d .escena-datos { position: static; width: 100%; }
+
+/* ---------- Demo por barrios ---------- */
+.demo-mapa { position: relative; }
+.demo-lado { display: grid; gap: 16px; align-content: start; }
+
+.ver-todo {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 500;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--noche);
+  color: var(--texto-noche);
+  font: 600 0.875rem/1 var(--fuente);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.2), 0 8px 18px rgb(0 0 0 / 0.2);
+  transition: transform 160ms var(--ease-out);
+}
+.ver-todo:active { transform: scale(0.97); }
+
+/* Pin de barrio: porcentaje grande y nombre debajo */
+.pin-barrio {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 96px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--fuente);
+}
+.pin-barrio b {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: var(--tinta-2);
+  color: #fff;
+  font: 700 1rem/1 var(--fuente-datos);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.2), 0 10px 22px rgb(0 0 0 / 0.2);
+  transition: transform 200ms var(--ease-out), background-color 300ms ease;
+}
+.pin-barrio span {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--noche);
+  color: var(--texto-noche);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pin-barrio.verde b { background: var(--verde); }
+.pin-barrio.amarillo b { background: var(--amarillo); color: var(--noche); }
+.pin-barrio.rojo b { background: var(--rojo); }
+.pin-barrio.elegido b { transform: scale(1.15); border-color: var(--noche); }
+.pin-barrio:active b { transform: scale(0.95); }
+
+/* Pin de gimnasio: aforo exacto */
+.pin-gim {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 76px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  background: var(--tinta-2);
+  color: #fff;
+  font: 500 0.75rem/1 var(--fuente-datos);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.2), 0 8px 16px rgb(0 0 0 / 0.18);
+  transition: transform 200ms var(--ease-out), background-color 300ms ease;
+}
+.pin-gim b { font-size: 0.9375rem; font-weight: 700; }
+.pin-gim span { opacity: 0.85; }
+.pin-gim.verde { background: var(--verde); }
+.pin-gim.amarillo { background: var(--amarillo); color: var(--noche); }
+.pin-gim.rojo { background: var(--rojo); }
+.pin-gim.elegido { transform: scale(1.18); border-color: var(--noche); }
+.pin-gim:active { transform: scale(0.95); }
+
+/* Chips de barrio debajo del mapa */
+.barrios { list-style: none; margin: 0; padding: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-barrio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--noche-linea);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--texto-noche);
+  font: 600 0.9375rem/1 var(--fuente);
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), background-color 150ms ease;
+}
+.chip-barrio:active { transform: scale(0.97); }
+.chip-barrio[aria-pressed="true"] { background: var(--noche-3); border-color: var(--texto-noche-2); }
+@media (hover: hover) and (pointer: fine) { .chip-barrio:hover { background: var(--noche-3); } }
+.chip-cifra { font: 500 0.8125rem/1 var(--fuente-datos); color: var(--texto-noche-2); font-variant-numeric: tabular-nums; }
+.chip-barrio .punto, .fila-gim .punto { background: var(--texto-noche-2); }
+.chip-barrio.verde .punto { background: var(--verde-luz); }
+.chip-barrio.amarillo .punto { background: var(--amarillo-luz); }
+.chip-barrio.rojo .punto { background: var(--rojo-luz); }
+
+/* Tarjeta del barrio con sus gimnasios */
+.barrio-caja { padding: 22px 24px 12px; border-radius: var(--radio); background: var(--noche-2); border: 1px solid var(--noche-linea); }
+.barrio-cabeza { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 14px; }
+.barrio-etiqueta { margin: 0 0 4px; font: 600 0.75rem/1 var(--fuente-datos); text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-noche-2); }
+.barrio-caja h3 { font-size: 1.75rem; letter-spacing: -0.03em; line-height: 1; }
+#b-resumen { margin: 6px 0 0; color: var(--texto-noche-2); font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
+.barrio-porcentaje { margin: 0; font: 700 2.5rem/1 var(--fuente-datos); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.barrio-caja.verde .barrio-porcentaje { color: var(--verde-luz); }
+.barrio-caja.amarillo .barrio-porcentaje { color: var(--amarillo-luz); }
+.barrio-caja.rojo .barrio-porcentaje { color: var(--rojo-luz); }
+.barrio-caja .medidor { background: var(--noche-linea); height: 8px; }
+.barrio-caja.verde .medidor-relleno { background: var(--verde-luz); }
+.barrio-caja.amarillo .medidor-relleno { background: var(--amarillo-luz); }
+.barrio-caja.rojo .medidor-relleno { background: var(--rojo-luz); }
+
+.gimnasios { list-style: none; margin: 12px -12px 0; padding: 0; }
+.fila-gim {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--texto-noche);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 160ms var(--ease-out);
+}
+.fila-gim:active { transform: scale(0.98); }
+.fila-gim[aria-pressed="true"] { background: var(--noche-3); }
+@media (hover: hover) and (pointer: fine) { .fila-gim:hover { background: var(--noche-3); } }
+.fila-texto { display: grid; min-width: 0; }
+.fila-nombre { font-weight: 600; font-size: 0.9875rem; }
+.fila-texto small { color: var(--texto-noche-2); font-size: 0.8125rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fila-aforo { font: 500 0.875rem/1 var(--fuente-datos); color: var(--texto-noche-2); font-variant-numeric: tabular-nums; }
+.fila-aforo b { font-size: 1.125rem; color: var(--texto-noche); }
+.mini-medidor { grid-column: 2 / -1; height: 4px; border-radius: 999px; background: var(--noche-linea); overflow: hidden; }
+.mini-medidor span { display: block; height: 100%; transform-origin: left; background: var(--texto-noche-2); transition: transform 500ms var(--ease-out), background-color 300ms ease; }
+.fila-gim.verde .mini-medidor span, .fila-gim.verde .punto { background: var(--verde-luz); }
+.fila-gim.amarillo .mini-medidor span, .fila-gim.amarillo .punto { background: var(--amarillo-luz); }
+.fila-gim.rojo .mini-medidor span, .fila-gim.rojo .punto { background: var(--rojo-luz); }
+
+@media (max-width: 1020px) {
+  .portada { grid-template-columns: 1fr; }
+  .escena { height: 440px; margin: 0 calc(var(--gutter) * -1); }
+}
+@media (max-width: 640px) {
+  .escena { height: auto; display: grid; }
+  .escena canvas { height: 340px; }
+  .escena-pie { display: none; }
+  .escena-datos { position: static; width: auto; margin: 0 var(--gutter); padding: 14px 16px; }
+}

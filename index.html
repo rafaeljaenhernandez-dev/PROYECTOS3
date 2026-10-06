@@ -27,8 +27,7 @@
       <a href="#solucion">Solución</a>
       <a href="#demo">Demo</a>
       <a href="#mercado">Mercado</a>
-      <a href="#equipo">Equipo</a>
-      <a href="#plan">Plan</a>
+      <a href="#fuentes">Fuentes</a>
     </nav>
     <a class="boton boton-pequeno" href="#demo">Ver en directo</a>
   </header>
@@ -46,14 +45,13 @@
         </div>
       </div>
 
-      <div class="pantalla" aria-label="Aforo en directo de algunos gimnasios">
-        <div class="pantalla-cabecera">
-          <span>Ahora en Madrid</span>
-          <span class="pantalla-reloj" id="portada-reloj">--:--</span>
+      <div class="escena" id="escena">
+        <canvas id="escena-3d" aria-hidden="true"></canvas>
+        <div class="escena-datos" aria-live="off">
+          <p class="escena-total"><strong id="portada-total">0</strong> personas entrenando ahora en <span id="portada-gimnasios">0</span> gimnasios de Madrid</p>
+          <p class="pantalla-paso" id="portada-paso">Esperando al primer torno…</p>
         </div>
-        <p class="pantalla-total"><strong id="portada-total">0</strong> personas entrenando en <span id="portada-gimnasios">8</span> gimnasios</p>
-        <ul class="pantalla-lista" id="portada-lista"></ul>
-        <p class="pantalla-paso" id="portada-paso">Esperando al primer torno…</p>
+        <p class="escena-pie"><span class="pantalla-reloj" id="portada-reloj">--:--</span> Cada columna es un gimnasio: su altura es la gente que hay dentro.</p>
       </div>
     </section>
 
@@ -160,7 +158,7 @@
     <section class="seccion seccion-demo" id="demo">
       <div class="seccion-cabeza revela">
         <h2>Así se vería Madrid ahora mismo.</h2>
-        <p>Los tornos de esta demo están simulados, pero se comportan como los de verdad: la gente entra y sale según la hora del día. Toca un gimnasio para ver su detalle.</p>
+        <p>Cada barrio enseña su porcentaje de ocupación, y dentro de él ves el aforo exacto de cada gimnasio. Los tornos están simulados, pero se comportan como los de verdad: la gente entra y sale según la hora del día.</p>
       </div>
 
       <div class="demo-barra">
@@ -177,37 +175,53 @@
 
       <div class="demo">
         <div class="demo-mapa">
-          <div id="mapa" class="mapa" aria-label="Mapa de gimnasios de Madrid"></div>
-          <ul class="demo-lista" id="demo-lista" aria-label="Gimnasios, de menos a más lleno"></ul>
+          <div id="mapa" class="mapa" aria-label="Mapa de barrios y gimnasios de Madrid"></div>
+          <button class="ver-todo" id="ver-todo" hidden>Ver todos los barrios</button>
+          <ul class="barrios" id="barrios" aria-label="Barrios"></ul>
         </div>
 
-        <aside class="detalle" id="detalle" aria-live="polite">
-          <div class="detalle-cabeza">
-            <div>
-              <h3 id="d-nombre">—</h3>
-              <p id="d-direccion"></p>
+        <div class="demo-lado">
+          <section class="barrio-caja" id="barrio-caja" aria-live="polite">
+            <div class="barrio-cabeza">
+              <div>
+                <p class="barrio-etiqueta">Barrio</p>
+                <h3 id="b-nombre">—</h3>
+                <p id="b-resumen"></p>
+              </div>
+              <p class="barrio-porcentaje" id="b-porcentaje">0 %</p>
             </div>
-            <p class="estado" id="d-estado"><span class="punto"></span><span></span></p>
-          </div>
+            <div class="medidor"><div class="medidor-relleno" id="b-relleno"></div></div>
+            <ul class="gimnasios" id="b-gimnasios" aria-label="Gimnasios del barrio"></ul>
+          </section>
 
-          <p class="detalle-cifra"><strong id="d-dentro">0</strong><span id="d-capacidad">/ 0</span></p>
-          <p class="detalle-pie"><span id="d-porcentaje">0</span> % del aforo · <span id="d-mejor"></span></p>
-          <div class="medidor" role="meter" aria-valuemin="0" aria-valuemax="100" aria-label="Ocupación" id="d-medidor">
-            <div class="medidor-relleno" id="d-relleno"></div>
-          </div>
+          <aside class="detalle" id="detalle">
+            <div class="detalle-cabeza">
+              <div>
+                <h3 id="d-nombre">—</h3>
+                <p id="d-direccion"></p>
+              </div>
+              <p class="estado" id="d-estado"><span class="punto"></span><span></span></p>
+            </div>
 
-          <h4>Previsión de hoy</h4>
-          <div class="grafica" id="d-grafica" role="img" aria-label="Ocupación prevista por horas"></div>
-          <div class="grafica-tooltip" id="tooltip" role="status" hidden></div>
+            <p class="detalle-cifra"><strong id="d-dentro">0</strong><span id="d-capacidad">/ 0</span></p>
+            <p class="detalle-pie"><span id="d-porcentaje">0</span> % del aforo · <span id="d-mejor"></span></p>
+            <div class="medidor" role="meter" aria-valuemin="0" aria-valuemax="100" aria-label="Ocupación" id="d-medidor">
+              <div class="medidor-relleno" id="d-relleno"></div>
+            </div>
 
-          <h4>Lo que ve el gimnasio</h4>
-          <dl class="gimnasio-datos">
-            <div><dt>Entradas hoy</dt><dd id="d-entradas">0</dd></div>
-            <div><dt>Pico previsto</dt><dd id="d-pico">--</dd></div>
-            <div><dt>Tornos en línea</dt><dd id="d-tornos">0</dd></div>
-          </dl>
-          <ul class="tornos" id="d-lista-tornos"></ul>
-        </aside>
+            <h4>Previsión de hoy</h4>
+            <div class="grafica" id="d-grafica" role="img" aria-label="Ocupación prevista por horas"></div>
+            <div class="grafica-tooltip" id="tooltip" role="status" hidden></div>
+
+            <h4>Lo que ve el gimnasio</h4>
+            <dl class="gimnasio-datos">
+              <div><dt>Entradas hoy</dt><dd id="d-entradas">0</dd></div>
+              <div><dt>Pico previsto</dt><dd id="d-pico">--</dd></div>
+              <div><dt>Tornos en línea</dt><dd id="d-tornos">0</dd></div>
+            </dl>
+            <ul class="tornos" id="d-lista-tornos"></ul>
+          </aside>
+        </div>
       </div>
 
       <div class="feed-caja">
@@ -328,56 +342,7 @@
       </table>
     </section>
 
-    <!-- 8 · EQUIPO -->
-    <section class="seccion seccion-papel" id="equipo">
-      <div class="seccion-cabeza revela">
-        <h2>Seis personas, un mismo semáforo.</h2>
-        <p>Cada uno lleva un bloque del proyecto y lo defiende en la ronda de preguntas.</p>
-      </div>
-      <ul class="equipo revela" id="equipo-lista"></ul>
-    </section>
-
-    <!-- 9 · PLAN Y METODOLOGÍA -->
-    <section class="seccion" id="plan">
-      <div class="seccion-cabeza revela">
-        <h2>Tres sprints hasta el piloto.</h2>
-      </div>
-      <ol class="linea-tiempo revela">
-        <li>
-          <time datetime="2026-10-20">20 oct</time>
-          <h3>Sprint 1 · La propuesta</h3>
-          <p>Problema con datos, mercado, competencia, DAFO y esta demo de cómo funcionaría.</p>
-        </li>
-        <li>
-          <time datetime="2026-11-10">10 nov</time>
-          <h3>Sprint 2 · Validar</h3>
-          <p>30 encuestas, 3 entrevistas a gimnasios y saber qué control de accesos usan.</p>
-        </li>
-        <li>
-          <time datetime="2026-12-01">1 dic</time>
-          <h3>Sprint 3 · Piloto</h3>
-          <p>Un gimnasio real conectado durante una semana y resultados frente a los criterios de éxito.</p>
-        </li>
-      </ol>
-
-      <div class="metodo revela">
-        <h3>Cómo trabajamos</h3>
-        <table class="tabla">
-          <thead><tr><th scope="col">Paso</th><th scope="col">Herramienta</th><th scope="col">Fuente</th></tr></thead>
-          <tbody>
-            <tr><td>Organizar el equipo</td><td>Scrum: 3 sprints, Product Owner, Scrum Master y retrospectiva</td><td>Equipo</td></tr>
-            <tr><td>Conocernos</td><td>Tests DISC y 16personalities</td><td><a href="#f8">8</a>, <a href="#f9">9</a></td></tr>
-            <tr><td>Medir el problema</td><td>Informes del sector y padrón municipal</td><td><a href="#f1">1</a>, <a href="#f2">2</a>, <a href="#f4">4</a></td></tr>
-            <tr><td>Analizar el entorno</td><td>Mapa del entorno, DAFO y stakeholders</td><td><a href="#f6">6</a>, <a href="#f7">7</a></td></tr>
-            <tr><td>Analizar la competencia</td><td>Tabla comparativa y curva de valor</td><td><a href="#f3">3</a>, <a href="#f5">5</a></td></tr>
-            <tr><td>Escuchar al cliente</td><td>Encuesta a usuarios y entrevistas a gimnasios</td><td>En curso</td></tr>
-            <tr><td>Esta web</td><td>HTML, CSS y JavaScript, mapa con Leaflet y OpenStreetMap</td><td><a href="#f10">10</a></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- 10 · CIERRE -->
+    <!-- 8 · CIERRE -->
     <section class="cierre" id="cierre">
       <div class="semaforo-grande" aria-hidden="true"><span></span><span></span><span></span></div>
       <h2>La próxima vez que vayas a entrenar, mira antes el semáforo.</h2>
@@ -385,7 +350,7 @@
       <a class="boton" href="#demo">Volver a la demo</a>
     </section>
 
-    <!-- 11 · FUENTES -->
+    <!-- 9 · FUENTES -->
     <section class="seccion fuentes" id="fuentes">
       <h2>Fuentes</h2>
       <ol>
@@ -396,11 +361,9 @@
         <li id="f5">Advenio. <a href="https://advenio.es/analiza-tu-posicionamiento-en-el-mercado-la-curva-de-valor-o-de-competencia">La curva de valor</a> y <a href="https://advenio.es/el-tamano-de-mercado-si-que-importa">el tamaño de mercado</a>.</li>
         <li id="f6">Semrush. <a href="https://es.semrush.com/blog/analisis-dafo">Análisis DAFO</a>.</li>
         <li id="f7">HubSpot. <a href="https://blog.hubspot.es/sales/que-es-mapa-stakeholders">Qué es un mapa de stakeholders</a>.</li>
-        <li id="f8">DISC Profile. <a href="https://www.discprofile.com/disc-styles">DISC Styles</a>.</li>
-        <li id="f9">16Personalities. <a href="https://www.16personalities.com/personality-types">Personality Types</a>.</li>
-        <li id="f10"><a href="https://leafletjs.com">Leaflet</a>, mapas de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.</li>
+        <li id="f8"><a href="https://leafletjs.com">Leaflet</a>, mapas de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.</li>
       </ol>
-      <p class="nota">Los gimnasios y los pasos por los tornos de la demo son simulados. Las calles y los barrios son reales.</p>
+      <p class="nota">Los gimnasios y los pasos por los tornos de la demo son simulados. Las calles y los barrios son reales. La animación de la portada usa <a href="https://threejs.org">three.js</a>.</p>
     </section>
   </main>
 
@@ -410,9 +373,11 @@
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/datos.js"></script>
   <script src="js/tornos.js"></script>
   <script src="js/web.js"></script>
   <script src="js/demo.js"></script>
+  <script src="js/escena3d.js"></script>
 </body>
 </html>

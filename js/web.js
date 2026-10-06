@@ -1,34 +1,4 @@
-// Partes "fijas" de la web: equipo, curva de valor y animación al hacer scroll
-
-// ---------- Equipo ----------
-// Roles preferidos y bloques: propuesta a confirmar por cada miembro
-const EQUIPO = [
-  { nombre: "Rafael Jaén", rol: "Front-end", extra: "Product Owner", bloque: "Solución y criterios de éxito" },
-  { nombre: "Iván Hernández", rol: "Back-end", extra: "Scrum Master", bloque: "Equipo y planificación" },
-  { nombre: "David Jaén", rol: "Full-stack", extra: "", bloque: "Demo web y tornos" },
-  { nombre: "Pablo Manzanedo", rol: "Diseño digital / UX", extra: "", bloque: "Marca, logo y diseño" },
-  { nombre: "Jaime González", rol: "Pruebas / QA", extra: "", bloque: "Entorno, DAFO y stakeholders" },
-  { nombre: "Jorge Mergelinas", rol: "Datos / investigación", extra: "", bloque: "Mercado y competidores" },
-];
-
-function iniciales(nombre) {
-  return nombre.split(" ").map((p) => p[0]).join("");
-}
-
-function pintarEquipo() {
-  const lista = document.getElementById("equipo-lista");
-  for (const m of EQUIPO) {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <span class="avatar" aria-hidden="true">${iniciales(m.nombre)}</span>
-      <div>
-        <h3>${m.nombre}</h3>
-        <p class="equipo-rol">${m.rol}${m.extra ? ` · <b>${m.extra}</b>` : ""}</p>
-        <p class="equipo-bloque">${m.bloque}</p>
-      </div>`;
-    lista.appendChild(li);
-  }
-}
+// Partes "fijas" de la web: curva de valor, menú y animación al hacer scroll
 
 // ---------- Curva de valor (SVG) ----------
 const CRITERIOS = ["Dato real", "Compara gimnasios", "Gimnasios de barrio", "Precio para el gimnasio", "Fácil para el usuario"];
@@ -105,7 +75,6 @@ function iniciarMenu() {
   document.querySelectorAll("main > section[id]").forEach((s) => observador.observe(s));
 }
 
-pintarEquipo();
 pintarCurvaValor();
 iniciarRevelado();
 iniciarMenu();
