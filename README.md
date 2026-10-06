@@ -1,25 +1,39 @@
-# AforoYa
+# AforoYa · Entrena sin esperas
 
-Aforo en tiempo real de gimnasios en Madrid. Prototipo en HTML, CSS y JavaScript puro, sin dependencias.
+Web de presentación y demo de AforoYa, el proyecto Q1 de Proyectos 3 (U-tad). AforoYa muestra el aforo real de los gimnasios de Madrid. El dato sale de los tornos de cada gimnasio, sin que nadie tenga que apuntar a mano quién entra o sale.
 
-## Qué hay
+Esto es una demo de cómo funcionaría, no el producto final. Los tornos y los gimnasios están simulados; las calles, los barrios y los datos del sector son reales y están citados en la propia web.
 
-- `index.html`: lista de gimnasios con semáforo. Verde (menos del 50 % del aforo), amarillo (50–79 %) y rojo (80 % o más). Se puede filtrar por estado y se ordena de menos a más lleno.
-- `recepcion.html`: panel de recepción. Eliges el gimnasio y marcas entradas y salidas. No deja entrar si el aforo está completo ni salir si no hay nadie.
-- `js/datos.js`: datos de ejemplo y funciones comunes (porcentaje, semáforo).
+## Qué enseña la web
 
-Los datos se guardan en `localStorage`. Si abres las dos páginas en pestañas distintas, la lista se actualiza sola al marcar entradas en recepción (evento `storage`).
+1. **Portada**: nombre, logo, eslogan y un contador en directo.
+2. **Problema**: situación actual, ideal y necesidad, cifras del sector con fuente y a quién le duele.
+3. **Solución**: cómo viaja el dato del torno al móvil y por qué así (preciso, sin trabajo extra, respeta el RGPD).
+4. **Demo en directo**: mapa de Madrid con el semáforo de cada gimnasio, previsión por horas, lo que ve el gimnasio y los pasos por los tornos en tiempo real. Se puede ver cómo estaría a otra hora (8:00, 14:30, 19:00...).
+5. **Beneficios** para el usuario y para el gimnasio.
+6. **Mercado**: tamaño de mercado, curva de valor, competidores y DAFO.
+7. **Criterios de éxito** medibles por sprint.
+8. **Equipo**, roles y bloque de cada uno.
+9. **Plan** de los 3 sprints y metodología (fuentes y herramientas).
+10. **Cierre** con llamada a la acción y **fuentes**.
 
-## Cómo arrancarlo
+## Cómo está hecha
 
-Abre `index.html` en el navegador, o sirve la carpeta:
+HTML, CSS y JavaScript sin frameworks. El mapa usa [Leaflet](https://leafletjs.com) con mapas de OpenStreetMap.
+
+- `js/datos.js`: gimnasios de ejemplo, curvas de ocupación por hora y semáforo (verde < 50 %, amarillo 50-79 %, rojo ≥ 80 %).
+- `js/tornos.js`: simulador de tornos. En la versión real, estos pasos llegarían del control de accesos del gimnasio.
+- `js/demo.js`: mapa, lista, detalle del gimnasio y pasos en directo.
+- `js/web.js`: equipo, curva de valor y animaciones al hacer scroll.
+
+## Cómo arrancarla
 
 ```
 python -m http.server 5500
 ```
 
-y entra en http://localhost:5500.
+y abre http://localhost:5500. El mapa necesita conexión a internet; sin ella, la lista sigue funcionando.
 
 ## Uso de IA
 
-El prototipo inicial (estructura, estilos y lógica del semáforo y la recepción) se generó con Claude Code y lo he revisado y adaptado.
+La estructura, los estilos y el código de la demo se generaron con Claude Code a partir de nuestra propuesta del Sprint 1, y el equipo los ha revisado. Los datos del sector salen de las fuentes citadas en la web.

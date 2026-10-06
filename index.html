@@ -3,42 +3,416 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AforoYa · Aforo de gimnasios en Madrid</title>
+  <title>AforoYa · Entrena sin esperas</title>
+  <meta name="description" content="AforoYa: el aforo real de los gimnasios de Madrid, contado por sus tornos y en tiempo real. Proyecto Q1 de Proyectos 3.">
+  <meta name="theme-color" content="#0c1410">
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="css/styles.css">
+  <script>document.documentElement.classList.add("js");</script>
 </head>
 <body>
+  <a class="saltar" href="#demo">Saltar a la demo</a>
+
   <header class="cabecera">
-    <a class="marca" href="index.html">Aforo<span>Ya</span></a>
-    <nav class="nav">
-      <a href="index.html" aria-current="page">Gimnasios</a>
-      <a href="recepcion.html">Recepción</a>
+    <a class="marca" href="#inicio" aria-label="AforoYa, inicio">
+      <img src="img/logo.svg" alt="" width="32" height="32">
+      <span>Aforo<b>Ya</b></span>
+    </a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="#problema">Problema</a>
+      <a href="#solucion">Solución</a>
+      <a href="#demo">Demo</a>
+      <a href="#mercado">Mercado</a>
+      <a href="#equipo">Equipo</a>
+      <a href="#plan">Plan</a>
     </nav>
+    <a class="boton boton-pequeno" href="#demo">Ver en directo</a>
   </header>
 
-  <main class="contenedor">
-    <section class="intro">
-      <h1>¿Cuánta gente hay ahora en tu gimnasio?</h1>
-      <p>Aforo en tiempo real de los gimnasios de Madrid. Mira el semáforo antes de salir de casa.</p>
+  <main>
+    <!-- 1 · PORTADA -->
+    <section class="portada" id="inicio">
+      <div class="portada-texto">
+        <p class="sello"><span class="latido" aria-hidden="true"></span>Demo en directo · Madrid</p>
+        <h1>Entrena<br>sin esperas.</h1>
+        <p class="entradilla">AforoYa cuenta a la gente en la puerta de cada gimnasio, con sus propios tornos, y te dice en tiempo real si hay hueco. Antes de salir de casa.</p>
+        <div class="portada-acciones">
+          <a class="boton" href="#demo">Probar la demo</a>
+          <a class="boton boton-claro" href="#problema">Por qué existe</a>
+        </div>
+      </div>
+
+      <div class="pantalla" aria-label="Aforo en directo de algunos gimnasios">
+        <div class="pantalla-cabecera">
+          <span>Ahora en Madrid</span>
+          <span class="pantalla-reloj" id="portada-reloj">--:--</span>
+        </div>
+        <p class="pantalla-total"><strong id="portada-total">0</strong> personas entrenando en <span id="portada-gimnasios">8</span> gimnasios</p>
+        <ul class="pantalla-lista" id="portada-lista"></ul>
+        <p class="pantalla-paso" id="portada-paso">Esperando al primer torno…</p>
+      </div>
     </section>
 
-    <div class="barra-herramientas">
-      <div class="filtros" role="group" aria-label="Filtrar por estado">
-        <button class="filtro" data-filtro="todos" aria-pressed="true">Todos</button>
-        <button class="filtro" data-filtro="verde" aria-pressed="false"><span class="punto verde"></span>Tranquilo</button>
-        <button class="filtro" data-filtro="amarillo" aria-pressed="false"><span class="punto amarillo"></span>Moderado</button>
-        <button class="filtro" data-filtro="rojo" aria-pressed="false"><span class="punto rojo"></span>Lleno</button>
+    <!-- 2 · PROBLEMA -->
+    <section class="seccion" id="problema">
+      <div class="seccion-cabeza revela">
+        <h2>Llegas al gimnasio y está lleno.</h2>
+        <p>Colas en las máquinas, vestuarios a reventar y media hora perdida. Y no había forma de saberlo antes de salir de casa.</p>
       </div>
-      <p class="actualizado" id="actualizado" aria-live="polite"></p>
-    </div>
 
-    <ul class="lista" id="lista"></ul>
-    <p class="vacio" id="vacio" hidden>Ningún gimnasio en este estado ahora mismo.</p>
+      <div class="tres-tiempos revela">
+        <div>
+          <h3>Hoy</h3>
+          <p>No sabes cuánta gente hay hasta que llegas. En hora punta entrenas peor o te das la vuelta.</p>
+        </div>
+        <div>
+          <h3>Lo ideal</h3>
+          <p>Consultas el aforo real de tu gimnasio y de los cercanos, y eliges cuándo y dónde ir.</p>
+        </div>
+        <div>
+          <h3>Lo que falta</h3>
+          <p>Un dato fiable, al momento y fácil de ver. También en los gimnasios de barrio sin app propia.</p>
+        </div>
+      </div>
+
+      <div class="cifras revela" aria-label="Datos del sector">
+        <div class="cifra">
+          <strong>8,3 M</strong>
+          <span>personas usan un gimnasio en España<a class="cita" href="#f1">1</a></span>
+        </div>
+        <div class="cifra">
+          <strong>5.806</strong>
+          <span>instalaciones fitness en España<a class="cita" href="#f1">1</a></span>
+        </div>
+        <div class="cifra">
+          <strong>69 %</strong>
+          <span>son independientes, sin la app de una gran cadena<a class="cita" href="#f1">1</a></span>
+        </div>
+        <div class="cifra">
+          <strong>3.235 M€</strong>
+          <span>facturó el sector fitness en 2025<a class="cita" href="#f1">1</a></span>
+        </div>
+      </div>
+
+      <div class="clientes revela">
+        <h3>A quién le duele</h3>
+        <table class="tabla">
+          <thead><tr><th scope="col">Quién</th><th scope="col">Cómo es</th><th scope="col">Qué le duele</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Usuario <small>gratis</small></th><td>Estudiantes y trabajadores de Madrid que solo pueden entrenar al salir de clase o del trabajo</td><td>Pierde tiempo, espera máquinas y a veces se da la vuelta</td></tr>
+            <tr><th scope="row">Gimnasio independiente <small>cliente que paga</small></th><td>Gimnasio de barrio con tornos o control de accesos, pero sin app para sus socios</td><td>Picos de tarde, salas vacías por la mañana y bajas por masificación</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3 · SOLUCIÓN: CÓMO FUNCIONA -->
+    <section class="seccion seccion-oscura" id="solucion">
+      <div class="seccion-cabeza revela">
+        <h2>El dato sale del torno, no de una persona.</h2>
+        <p>Nadie tiene que apuntar quién entra. Cada paso por el torno suma o resta uno, y en segundos el semáforo de ese gimnasio cambia en la web.</p>
+      </div>
+
+      <ol class="flujo revela" aria-label="Cómo viaja el dato">
+        <li>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="6" width="10" height="36" rx="3"/><rect x="30" y="6" width="10" height="36" rx="3"/><path d="M18 22h12M18 26l10 6"/></svg>
+          <h3>Torno</h3>
+          <p>Cada entrada suma uno y cada salida resta uno. No se guarda quién es: solo el número.</p>
+        </li>
+        <li>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="12" width="32" height="24" rx="4"/><path d="M16 24h4l3-6 4 12 3-6h2"/></svg>
+          <h3>Conector</h3>
+          <p>Lee el control de accesos que el gimnasio ya tiene. Si no hay tornos, un contador en la puerta hace lo mismo.</p>
+        </li>
+        <li>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="8" width="28" height="10" rx="3"/><rect x="10" y="20" width="28" height="10" rx="3"/><rect x="10" y="32" width="28" height="8" rx="3"/><path d="M16 13h2M16 25h2"/></svg>
+          <h3>Servidor AforoYa</h3>
+          <p>Calcula el aforo, guarda el histórico por horas y prepara la previsión del día.</p>
+        </li>
+        <li>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="14" y="4" width="20" height="40" rx="5"/><circle cx="24" cy="16" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="24" cy="32" r="3"/></svg>
+          <h3>Tu móvil</h3>
+          <p>Ves el semáforo de cada gimnasio, la gente que hay y la hora más tranquila.</p>
+        </li>
+      </ol>
+
+      <div class="porque revela">
+        <div>
+          <strong>Preciso</strong>
+          <p>Cuenta a todo el que pasa por la puerta, no una estimación como las horas punta de Google Maps.</p>
+        </div>
+        <div>
+          <strong>Sin trabajo extra</strong>
+          <p>Recepción no toca nada. El gimnasio solo conecta el sistema que ya usa.</p>
+        </div>
+        <div>
+          <strong>Respeta la privacidad</strong>
+          <p>Solo viajan números. Ningún dato personal sale del gimnasio, como pide el RGPD.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · DEMO -->
+    <section class="seccion seccion-demo" id="demo">
+      <div class="seccion-cabeza revela">
+        <h2>Así se vería Madrid ahora mismo.</h2>
+        <p>Los tornos de esta demo están simulados, pero se comportan como los de verdad: la gente entra y sale según la hora del día. Toca un gimnasio para ver su detalle.</p>
+      </div>
+
+      <div class="demo-barra">
+        <div class="horas" role="group" aria-label="Elegir la hora">
+          <span>Ver a las</span>
+          <button class="hora" data-hora="ahora" aria-pressed="true">Ahora</button>
+          <button class="hora" data-hora="8" aria-pressed="false">8:00</button>
+          <button class="hora" data-hora="11" aria-pressed="false">11:00</button>
+          <button class="hora" data-hora="14.5" aria-pressed="false">14:30</button>
+          <button class="hora" data-hora="19" aria-pressed="false">19:00</button>
+        </div>
+        <p class="demo-estado"><span class="latido" aria-hidden="true"></span><span id="demo-ritmo">0</span> pasos por torno en el último minuto</p>
+      </div>
+
+      <div class="demo">
+        <div class="demo-mapa">
+          <div id="mapa" class="mapa" aria-label="Mapa de gimnasios de Madrid"></div>
+          <ul class="demo-lista" id="demo-lista" aria-label="Gimnasios, de menos a más lleno"></ul>
+        </div>
+
+        <aside class="detalle" id="detalle" aria-live="polite">
+          <div class="detalle-cabeza">
+            <div>
+              <h3 id="d-nombre">—</h3>
+              <p id="d-direccion"></p>
+            </div>
+            <p class="estado" id="d-estado"><span class="punto"></span><span></span></p>
+          </div>
+
+          <p class="detalle-cifra"><strong id="d-dentro">0</strong><span id="d-capacidad">/ 0</span></p>
+          <p class="detalle-pie"><span id="d-porcentaje">0</span> % del aforo · <span id="d-mejor"></span></p>
+          <div class="medidor" role="meter" aria-valuemin="0" aria-valuemax="100" aria-label="Ocupación" id="d-medidor">
+            <div class="medidor-relleno" id="d-relleno"></div>
+          </div>
+
+          <h4>Previsión de hoy</h4>
+          <div class="grafica" id="d-grafica" role="img" aria-label="Ocupación prevista por horas"></div>
+          <div class="grafica-tooltip" id="tooltip" role="status" hidden></div>
+
+          <h4>Lo que ve el gimnasio</h4>
+          <dl class="gimnasio-datos">
+            <div><dt>Entradas hoy</dt><dd id="d-entradas">0</dd></div>
+            <div><dt>Pico previsto</dt><dd id="d-pico">--</dd></div>
+            <div><dt>Tornos en línea</dt><dd id="d-tornos">0</dd></div>
+          </dl>
+          <ul class="tornos" id="d-lista-tornos"></ul>
+        </aside>
+      </div>
+
+      <div class="feed-caja">
+        <h3>Pasos por los tornos <small>en directo</small></h3>
+        <ol class="feed" id="feed"></ol>
+      </div>
+    </section>
+
+    <!-- 5 · BENEFICIOS -->
+    <section class="seccion" id="beneficios">
+      <div class="seccion-cabeza revela">
+        <h2>Gana el que entrena y gana el gimnasio.</h2>
+      </div>
+      <div class="beneficios revela">
+        <div>
+          <h3><span class="punto verde"></span>Para ti</h3>
+          <ul>
+            <li>No haces viajes en balde.</li>
+            <li>Entrenas cómodo, sin esperar máquinas.</li>
+            <li>Comparas los gimnasios cercanos antes de apuntarte.</li>
+            <li>Gratis y sin registrarte.</li>
+          </ul>
+        </div>
+        <div>
+          <h3><span class="punto amarillo"></span>Para el gimnasio</h3>
+          <ul>
+            <li>Reparte a sus socios hacia las horas tranquilas.</li>
+            <li>Menos quejas y menos bajas por masificación.</li>
+            <li>Se ve al lado de las cadenas sin hacer una app propia.</li>
+            <li>Sabe cuánta gente tiene cada hora para organizar personal y clases.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · MERCADO Y COMPETENCIA -->
+    <section class="seccion seccion-papel" id="mercado">
+      <div class="seccion-cabeza revela">
+        <h2>Un hueco que nadie cubre.</h2>
+        <p>Las grandes cadenas ya enseñan su aforo, pero solo el suyo. Los gimnasios de barrio no tienen nada, y nadie compara varios gimnasios a la vez.</p>
+      </div>
+
+      <div class="mercado revela">
+        <div class="embudo" aria-label="Tamaño de mercado">
+          <div class="embudo-nivel">
+            <span class="embudo-etiqueta">Mercado total</span>
+            <strong>8,3 M usuarios</strong>
+            <span>y 5.806 instalaciones en España<a class="cita" href="#f1">1</a></span>
+          </div>
+          <div class="embudo-nivel">
+            <span class="embudo-etiqueta">Alcanzable</span>
+            <strong>≈ 500.000 usuarios</strong>
+            <span>y ≈ 290 gimnasios independientes en Madrid capital<a class="cita" href="#f4">4</a></span>
+          </div>
+          <div class="embudo-nivel">
+            <span class="embudo-etiqueta">Objetivo</span>
+            <strong>20 gimnasios</strong>
+            <span>el primer año (7 % del alcanzable); en Q1, un piloto en 1 a 3</span>
+          </div>
+        </div>
+        <p class="nota">Cómo lo calculamos: 3,52 M de habitantes en Madrid capital<a class="cita" href="#f4">4</a> × 87 % mayores de 15 años × 16,5 % que usa un gimnasio<a class="cita" href="#f1">1</a> ≈ 500.000. El 87 % y el precio de 29 €/mes por gimnasio son hipótesis del equipo que validamos en el Sprint 2.</p>
+      </div>
+
+      <div class="competencia revela">
+        <div class="curva">
+          <h3>Curva de valor</h3>
+          <p class="curva-sub">Puntuación de 1 a 5 hecha por el equipo, pendiente de validar con la encuesta.</p>
+          <div id="curva-valor"></div>
+          <ul class="leyenda" id="curva-leyenda"></ul>
+        </div>
+        <table class="tabla">
+          <thead><tr><th scope="col">Competidor</th><th scope="col">Qué ofrece</th><th scope="col">Qué le falta</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">App de Basic-Fit</th><td>Aforo del club en tiempo real<a class="cita" href="#f3">3</a></td><td>Solo sus propios clubes</td></tr>
+            <tr><th scope="row">Google Maps</th><td>“Horas punta” estimadas con la ubicación de los móviles</td><td>Es una estimación, no el aforo real</td></tr>
+            <tr><th scope="row">Software de gestión</th><td>Control de accesos y reservas para el gimnasio</td><td>Es interno: el usuario no lo ve ni compara</td></tr>
+            <tr><th scope="row">AforoYa</th><td>Aforo real de los tornos de todos los gimnasios del barrio</td><td>Necesita conectarse con cada gimnasio</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="dafo revela" aria-label="Análisis DAFO">
+        <div class="dafo-celda">
+          <h3>Debilidades</h3>
+          <ul><li>Sin experiencia vendiendo a negocios</li><li>Hay que integrarse con el control de accesos de cada gimnasio</li><li>Marca nueva, sin usuarios todavía</li></ul>
+        </div>
+        <div class="dafo-celda">
+          <h3>Amenazas</h3>
+          <ul><li>Google Maps mejora sus estimaciones</li><li>Las cadenas grandes ya tienen app propia</li><li>Algún gimnasio no querrá mostrar que está lleno</li></ul>
+        </div>
+        <div class="dafo-celda">
+          <h3>Fortalezas</h3>
+          <ul><li>Somos usuarios del problema</li><li>Dato exacto del torno, sin trabajo para recepción</li><li>Coste casi nulo para empezar</li></ul>
+        </div>
+        <div class="dafo-celda">
+          <h3>Oportunidades</h3>
+          <ul><li>El 69 % de gimnasios no tiene app de cadena<a class="cita" href="#f1">1</a></li><li>Basic-Fit demuestra que el usuario lo quiere<a class="cita" href="#f3">3</a></li><li>El sector crece un 10 % al año<a class="cita" href="#f2">2</a></li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · OBJETIVOS Y CRITERIOS DE ÉXITO -->
+    <section class="seccion" id="exito">
+      <div class="seccion-cabeza revela">
+        <h2>Cómo sabremos que funciona.</h2>
+        <p><strong>Objetivo:</strong> que nadie llegue a un gimnasio lleno sin saberlo, y que los gimnasios repartan mejor a sus socios a lo largo del día.</p>
+      </div>
+      <table class="tabla tabla-exito revela">
+        <thead><tr><th scope="col">Criterio</th><th scope="col">Meta</th><th scope="col">Cuándo</th></tr></thead>
+        <tbody>
+          <tr><td>Respuestas a la encuesta de usuarios</td><td>30 o más</td><td>Sprint 2 · 10 nov</td></tr>
+          <tr><td>Usuarios que dicen que lo usarían</td><td>70 % o más</td><td>Sprint 2 · 10 nov</td></tr>
+          <tr><td>Gimnasios entrevistados / interesados en el piloto</td><td>3 / 1</td><td>Sprint 2 · 10 nov</td></tr>
+          <tr><td>Retraso entre el torno y la web</td><td>Menos de 10 segundos</td><td>Sprint 3 · 1 dic</td></tr>
+          <tr><td>Aforo de AforoYa frente a un recuento a mano</td><td>95 % de acierto o más</td><td>Sprint 3 · 1 dic</td></tr>
+          <tr><td>Personas distintas que visitan la web en el piloto</td><td>50 o más</td><td>Sprint 3 · 1 dic</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 8 · EQUIPO -->
+    <section class="seccion seccion-papel" id="equipo">
+      <div class="seccion-cabeza revela">
+        <h2>Seis personas, un mismo semáforo.</h2>
+        <p>Cada uno lleva un bloque del proyecto y lo defiende en la ronda de preguntas.</p>
+      </div>
+      <ul class="equipo revela" id="equipo-lista"></ul>
+    </section>
+
+    <!-- 9 · PLAN Y METODOLOGÍA -->
+    <section class="seccion" id="plan">
+      <div class="seccion-cabeza revela">
+        <h2>Tres sprints hasta el piloto.</h2>
+      </div>
+      <ol class="linea-tiempo revela">
+        <li>
+          <time datetime="2026-10-20">20 oct</time>
+          <h3>Sprint 1 · La propuesta</h3>
+          <p>Problema con datos, mercado, competencia, DAFO y esta demo de cómo funcionaría.</p>
+        </li>
+        <li>
+          <time datetime="2026-11-10">10 nov</time>
+          <h3>Sprint 2 · Validar</h3>
+          <p>30 encuestas, 3 entrevistas a gimnasios y saber qué control de accesos usan.</p>
+        </li>
+        <li>
+          <time datetime="2026-12-01">1 dic</time>
+          <h3>Sprint 3 · Piloto</h3>
+          <p>Un gimnasio real conectado durante una semana y resultados frente a los criterios de éxito.</p>
+        </li>
+      </ol>
+
+      <div class="metodo revela">
+        <h3>Cómo trabajamos</h3>
+        <table class="tabla">
+          <thead><tr><th scope="col">Paso</th><th scope="col">Herramienta</th><th scope="col">Fuente</th></tr></thead>
+          <tbody>
+            <tr><td>Organizar el equipo</td><td>Scrum: 3 sprints, Product Owner, Scrum Master y retrospectiva</td><td>Equipo</td></tr>
+            <tr><td>Conocernos</td><td>Tests DISC y 16personalities</td><td><a href="#f8">8</a>, <a href="#f9">9</a></td></tr>
+            <tr><td>Medir el problema</td><td>Informes del sector y padrón municipal</td><td><a href="#f1">1</a>, <a href="#f2">2</a>, <a href="#f4">4</a></td></tr>
+            <tr><td>Analizar el entorno</td><td>Mapa del entorno, DAFO y stakeholders</td><td><a href="#f6">6</a>, <a href="#f7">7</a></td></tr>
+            <tr><td>Analizar la competencia</td><td>Tabla comparativa y curva de valor</td><td><a href="#f3">3</a>, <a href="#f5">5</a></td></tr>
+            <tr><td>Escuchar al cliente</td><td>Encuesta a usuarios y entrevistas a gimnasios</td><td>En curso</td></tr>
+            <tr><td>Esta web</td><td>HTML, CSS y JavaScript, mapa con Leaflet y OpenStreetMap</td><td><a href="#f10">10</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10 · CIERRE -->
+    <section class="cierre" id="cierre">
+      <div class="semaforo-grande" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h2>La próxima vez que vayas a entrenar, mira antes el semáforo.</h2>
+      <p>Buscamos un gimnasio de Madrid que quiera ser el primero en conectar sus tornos. ¿Conoces uno?</p>
+      <a class="boton" href="#demo">Volver a la demo</a>
+    </section>
+
+    <!-- 11 · FUENTES -->
+    <section class="seccion fuentes" id="fuentes">
+      <h2>Fuentes</h2>
+      <ol>
+        <li id="f1">Fundación España Activa, Deloitte y FNEID (2026). <em>I Informe Anual del Sector del Fitness en España</em>. Resumen en <a href="https://www.bolsamania.com/noticias/empresas/economia--el-sector-fitness-supera-los-3200-millones-en-2025-y-los-8-millones-de-usuarios-segun-espana-activa--22368264.html">Bolsamanía / Europa Press</a>, 28 de abril de 2026.</li>
+        <li id="f2">DBK Informa (2026). <a href="https://www.dbk.es/en/detalle-nota/gimnasios-2026"><em>Gimnasios</em></a>. Nota de prensa, 13 de enero de 2026.</li>
+        <li id="f3">Basic-Fit. <a href="https://www.basic-fit.com/es-es/basic-fitapp">Basic-Fit App: aforo del club en tiempo real</a>.</li>
+        <li id="f4">Ayuntamiento de Madrid. Padrón Municipal de Habitantes, 2025.</li>
+        <li id="f5">Advenio. <a href="https://advenio.es/analiza-tu-posicionamiento-en-el-mercado-la-curva-de-valor-o-de-competencia">La curva de valor</a> y <a href="https://advenio.es/el-tamano-de-mercado-si-que-importa">el tamaño de mercado</a>.</li>
+        <li id="f6">Semrush. <a href="https://es.semrush.com/blog/analisis-dafo">Análisis DAFO</a>.</li>
+        <li id="f7">HubSpot. <a href="https://blog.hubspot.es/sales/que-es-mapa-stakeholders">Qué es un mapa de stakeholders</a>.</li>
+        <li id="f8">DISC Profile. <a href="https://www.discprofile.com/disc-styles">DISC Styles</a>.</li>
+        <li id="f9">16Personalities. <a href="https://www.16personalities.com/personality-types">Personality Types</a>.</li>
+        <li id="f10"><a href="https://leafletjs.com">Leaflet</a>, mapas de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.</li>
+      </ol>
+      <p class="nota">Los gimnasios y los pasos por los tornos de la demo son simulados. Las calles y los barrios son reales.</p>
+    </section>
   </main>
 
+  <footer class="pie">
+    <span class="marca"><img src="img/logo.svg" alt="" width="24" height="24"><span>Aforo<b>Ya</b></span></span>
+    <span>Entrena sin esperas · Proyectos 3 · U-tad · 2026</span>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/datos.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/tornos.js"></script>
+  <script src="js/web.js"></script>
+  <script src="js/demo.js"></script>
 </body>
 </html>
