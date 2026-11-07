@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AforoYa · Torno</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: Inter, Arial, sans-serif; background: #14532d; color: #f7f8f5; min-height: 100vh;
+         display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 32px 24px; text-align: center; }
+  .marca { font-weight: 800; font-size: 22px; display: flex; gap: 8px; align-items: center; }
+  .punto { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+  h1 { font-size: 30px; font-weight: 800; margin-top: 8px; }
+  .estado { font-size: 18px; color: #cfe6d7; margin-top: 8px; }
+  button { width: min(78vw, 360px); aspect-ratio: 1; border-radius: 50%; border: none; font-family: inherit;
+           font-size: 40px; font-weight: 800; cursor: pointer; transition: transform .1s, background .3s; }
+  button:active { transform: scale(.96); }
+  .entrar { background: #2fd27a; color: #0f2a1c; box-shadow: 0 0 0 16px rgba(47,210,122,.2); }
+  .salir  { background: #f7f8f5; color: #14532d; box-shadow: 0 0 0 16px rgba(247,248,245,.15); }
+  .aforo { font-size: 20px; padding: 14px 22px; border-radius: 999px; background: #0f2a1c; display: inline-flex; gap: 10px; align-items: center; }
+  .pie { font-size: 13px; color: #9fd9b4; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="marca"><span class="punto" style="background:#2fd27a"></span><span class="punto" style="background:#f5b700"></span><span class="punto" style="background:#e5484d"></span>AforoYa</div>
+    <h1 id="titulo">Torno de entrada</h1>
+    <p class="estado" id="estado">Pulsa para entrar en el gimnasio</p>
+  </div>
+  <button id="boton" class="entrar">Entrar</button>
+  <div>
+    <p class="aforo"><span class="punto" id="luz" style="background:#2fd27a"></span><span id="aforo">…</span></p>
+    <p class="pie" style="margin-top:16px">Anónimo: no guardamos ningún dato personal.</p>
+  </div>
+<script src="config.js"></script>
+<script src="motor.js"></script>
+<script>
+(async function () {
+  const { semaforo } = window.AforoYa;
+  const NOMBRE_GIMNASIO = AforoYa.config.nombreGimnasio, SALA = AforoYa.config.sala;
+  let motor;
+  try { motor = await AforoYa.listo; }
+  catch (e) { document.getElementById("estado").textContent = "No se pudo conectar con el motor (revisa config.js)"; return; }
+  const clave = "aforoya-dentro-" + SALA;
+  const boton = document.getElementById("boton");
+  document.getElementById("titulo").textContent = NOMBRE_GIMNASIO;
+  let dentro = localStorage.getItem(clave) === "1";
+  let ocupado = false;
+  function pintar() {
+    boton.textContent = dentro ? "Salir" : "Entrar";
+    boton.className = dentro ? "salir" : "entrar";
+    document.getElementById("estado").textContent = dentro ? "Estás dentro. ¡A entrenar!" : "Pulsa para pasar el torno";
+  }
+  boton.addEventListener("click", async () => {
+    if (ocupado) return;
+    ocupado = true;
+    try {
+      await motor.mover(dentro ? -1 : 1, "movil");
+      dentro = !dentro;
+      localStorage.setItem(clave, dentro ? "1" : "0");
+      if (navigator.vibrate) navigator.vibrate(60);
+      pintar();
+    } catch (e) {
+      document.getElementById("estado").textContent = "Sin conexión: inténtalo otra vez";
+    } finally { ocupado = false; }
+  });
+  if (AforoYa.modo === "ntfy") {
+    document.getElementById("aforo").textContent = "Mira la pantalla grande";
+  } else motor.escuchar(({ dentro: n, max }) => {
+    const p = Math.round((n / max) * 100);
+    const s = semaforo(p);
+    document.getElementById("luz").style.background = s.hex;
+    document.getElementById("aforo").textContent = `${s.texto} · ${p} %`;
+  });
+  pintar();
+})();
+</script>
+</body>
+</html>

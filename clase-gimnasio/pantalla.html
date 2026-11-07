@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AforoYa · Pantalla</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="qrcode.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body { font-family: Inter, Arial, sans-serif; background: #f7f8f5; color: #17202a; display: flex; flex-direction: column; padding: 4vh 5vw; gap: 3vh; overflow: hidden; }
+  header { display: flex; justify-content: space-between; align-items: center; }
+  .marca { font-weight: 800; font-size: 2.2vw; color: #14532d; display: flex; gap: .6vw; align-items: center; }
+  .punto { width: 1.1vw; height: 1.1vw; border-radius: 50%; display: inline-block; }
+  #reloj { font-size: 2.2vw; font-weight: 800; color: #14532d; font-variant-numeric: tabular-nums; }
+  main { flex: 1; display: grid; grid-template-columns: 1.3fr 1fr; gap: 4vw; align-items: center; }
+  .widget { display: flex; flex-direction: column; align-items: center; gap: 2.5vh; }
+  .anillo { width: min(36vw, 62vh); aspect-ratio: 1; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: conic-gradient(var(--c) calc(var(--p) * 1%), #e2e8e3 0); transition: background .6s; position: relative; }
+  .anillo::after { content: ""; position: absolute; inset: 7%; border-radius: 50%; background: #f7f8f5; }
+  .anillo > * { position: relative; z-index: 1; }
+  #pct { font-size: min(9vw, 16vh); font-weight: 800; line-height: 1; color: #14532d; font-variant-numeric: tabular-nums; }
+  #personas { font-size: min(1.8vw, 3.2vh); color: #4a5560; margin-top: 1vh; }
+  #estado { font-size: min(3vw, 5vh); font-weight: 800; padding: 1.2vh 2.4vw; border-radius: 999px; color: #0f2a1c; transition: background .6s; }
+  .lado { display: flex; flex-direction: column; gap: 3vh; }
+  .qrcaja { background: #14532d; color: #f7f8f5; border-radius: 2vw; padding: 3vh 2vw; display: flex; gap: 2vw; align-items: center; }
+  #qr { background: #fff; padding: 1vw; border-radius: 1vw; }
+  #qr svg { width: min(14vw, 26vh); height: min(14vw, 26vh); display: block; }
+  .qrcaja h2 { font-size: 2.4vw; font-weight: 800; line-height: 1.1; }
+  .qrcaja p { font-size: 1.2vw; color: #cfe6d7; margin-top: 1vh; word-break: break-all; }
+  .latencia { background: #e2f2e7; border-radius: 2vw; padding: 2.4vh 2vw; }
+  .latencia b { font-size: 3vw; color: #14532d; font-variant-numeric: tabular-nums; }
+  .latencia span { font-size: 1.3vw; color: #4a5560; display: block; }
+  ul { list-style: none; display: flex; flex-direction: column; gap: .8vh; font-size: 1.3vw; color: #4a5560; min-height: 18vh; }
+  footer { display: flex; justify-content: space-between; font-size: .9vw; color: #8a948d; }
+  #aviso { color: #b42318; font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <div class="marca"><span class="punto" style="background:#2fd27a"></span><span class="punto" style="background:#f5b700"></span><span class="punto" style="background:#e5484d"></span>AforoYa · <span id="gimnasio"></span></div>
+  <div id="reloj">--:--:--</div>
+</header>
+<main>
+  <section class="widget">
+    <div class="anillo" id="anillo" style="--p:0;--c:#2fd27a">
+      <div id="pct">0 %</div>
+      <div id="personas">0 de 25 personas</div>
+    </div>
+    <div id="estado" style="background:#2fd27a">Hay sitio</div>
+  </section>
+  <section class="lado">
+    <div class="qrcaja">
+      <div id="qr"></div>
+      <div><h2>Escanea y pasa el torno</h2><p id="url"></p></div>
+    </div>
+    <div class="latencia"><b id="lat">–</b><span>desde que pulsaste hasta que lo ves aquí</span></div>
+    <ul id="feed"></ul>
+  </section>
+</main>
+<footer>
+  <span id="modo"></span>
+  <span id="aviso"></span>
+  <span>S simulador · R reiniciar · + / − manual · M aforo máximo</span>
+</footer>
+<script src="config.js"></script>
+<script src="motor.js"></script>
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  const { semaforo } = window.AforoYa;
+  const NOMBRE_GIMNASIO = AforoYa.config.nombreGimnasio;
+  let motor;
+  try { motor = await AforoYa.listo; }
+  catch (e) { $("aviso").textContent = "No se pudo conectar con Firebase: revisa config.js"; return; }
+  $("gimnasio").textContent = NOMBRE_GIMNASIO;
+  $("modo").textContent = "Motor: " + motor.modo;
+
+  // QR que apunta al torno (misma carpeta que esta página)
+  const urlTorno = new URL("torno.html", location.href).href;
+  $("url").textContent = urlTorno.replace(/^https?:\/\//, "");
+  try {
+    const q = qrcode(0, "M"); q.addData(urlTorno); q.make();
+    $("qr").innerHTML = q.createSvgTag({ cellSize: 8, margin: 0, scalable: true });
+  } catch (e) { $("qr").textContent = "QR no disponible"; }
+  if (location.protocol === "file:") $("aviso").textContent = "Abierto como archivo: vale para ensayar, pero el QR solo funciona con la web desplegada";
+
+  // Aforo máximo por URL: pantalla.html?max=30
+  const maxUrl = parseInt(new URLSearchParams(location.search).get("max"));
+  if (maxUrl > 0) motor.fijarMaximo(maxUrl);
+
+  setInterval(() => { $("reloj").textContent = new Date().toLocaleTimeString("es-ES"); }, 1000);
+
+  let ultimo = 0;
+  motor.escuchar(({ dentro, max, eventos }) => {
+    const p = Math.min(100, Math.round((dentro / max) * 100));
+    const s = semaforo(p);
+    $("anillo").style.setProperty("--p", p);
+    $("anillo").style.setProperty("--c", s.hex);
+    $("pct").textContent = p + " %";
+    $("personas").textContent = `${dentro} de ${max} personas`;
+    $("estado").textContent = s.texto;
+    $("estado").style.background = s.hex;
+
+    const recientes = eventos.slice(-5).reverse();
+    $("feed").innerHTML = recientes.map((e) => {
+      const h = e.ts ? new Date(e.ts).toLocaleTimeString("es-ES") : "";
+      const quien = e.origen === "simulador" ? "torno simulado" : "móvil";
+      return `<li>${h} · ${e.tipo === "entra" ? "↗ Entra" : "↙ Sale"} alguien (${quien})</li>`;
+    }).join("");
+
+    const ev = eventos[eventos.length - 1];
+    if (ev && ev.ts && ev.ts !== ultimo) {
+      ultimo = ev.ts;
+      const seg = Math.max(0, (motor.ahora() - ev.ts) / 1000);
+      $("lat").textContent = seg.toFixed(1).replace(".", ",") + " s";
+    }
+  });
+
+  // Plan B: simulador de tornos (tecla S) y controles del presentador
+  let sim = null;
+  document.addEventListener("keydown", async (k) => {
+    if (k.key === "s" || k.key === "S") {
+      if (sim) { clearInterval(sim); sim = null; $("aviso").textContent = ""; return; }
+      $("aviso").textContent = "Simulador de tornos activo";
+      sim = setInterval(() => motor.mover(Math.random() < 0.85 ? 1 : -1, "simulador"), 1200);
+    }
+    if (k.key === "r" || k.key === "R") { if (confirm("¿Reiniciar el aforo a 0?")) motor.reiniciar(); }
+    if (k.key === "+") motor.mover(1, "simulador");
+    if (k.key === "-") motor.mover(-1, "simulador");
+    if (k.key === "m" || k.key === "M") { const m = parseInt(prompt("Aforo máximo (personas en clase):", "25")); if (m > 0) motor.fijarMaximo(m); }
+  });
+})();
+</script>
+</body>
+</html>
