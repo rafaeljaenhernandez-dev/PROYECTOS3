@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AforoYa · Tu gimnasio, sin colas</title>
+  <meta name="description" content="AforoYa lee los tornos de tu gimnasio y muestra el aforo en directo con un semáforo. Tus socios eligen la hora tranquila y tu sala deja de colapsar a las siete.">
+  <meta name="theme-color" content="#0f2a1c">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='9' y='2' width='14' height='28' rx='5' fill='%2314532d'/%3E%3Ccircle cx='16' cy='9' r='3.2' fill='%23e5484d'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23f5b700'/%3E%3Ccircle cx='16' cy='23' r='3.2' fill='%232fd27a'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="fonts/fuentes.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="escena" aria-hidden="true"></canvas>
+  <div class="velo" aria-hidden="true"></div>
+
+  <header class="barra">
+    <a class="marca" href="#inicio" aria-label="AforoYa, inicio">
+      <svg class="marca-icono" viewBox="0 0 20 40" aria-hidden="true"><rect x="1" y="1" width="18" height="38" rx="6"/><circle class="l-r" cx="10" cy="10" r="4"/><circle class="l-a" cx="10" cy="20" r="4"/><circle class="l-v" cx="10" cy="30" r="4"/></svg>
+      <span>AforoYa</span>
+    </a>
+    <nav class="menu" aria-label="Secciones">
+      <a href="#semaforo">El semáforo</a>
+      <a href="#torno">Cómo funciona</a>
+      <a href="#para-ti">Para tu gimnasio</a>
+      <a href="#anuncio">Vídeo</a>
+    </nav>
+    <a class="boton boton-claro boton-peque" href="#contacto">Pide una demo</a>
+  </header>
+
+  <main>
+    <!-- 1 · Apertura: la sección se queda fija y al deslizar pasa la tarde -->
+    <section id="inicio" class="apertura" data-escena="cola" data-fija data-estado="verde">
+      <div class="apertura-fija">
+        <div class="contenido">
+          <p class="reloj-hero" aria-hidden="true"><i></i><span id="h-hora">17:30</span><span class="sep">·</span><span id="h-pct">22 %</span><span>de aforo</span></p>
+          <h1 class="titular" aria-label="Llegan. Esperan. Se van.">
+            <span class="linea l1"><span>Llegan.</span></span>
+            <span class="linea l2"><span>Esperan.</span></span>
+            <span class="linea l3"><span>Se van.</span></span>
+          </h1>
+          <p class="entradilla">A las siete de la tarde, tus socios no saben cuánta gente hay en la sala hasta que cruzan el torno. Para entonces ya es tarde: <mark>colas</mark> en cada máquina.</p>
+          <div class="acciones">
+            <a class="boton boton-claro" href="#semaforo">Ver cómo lo arreglamos</a>
+            <a class="boton boton-hueco" href="#anuncio">Ver el anuncio</a>
+          </div>
+        </div>
+        <div class="progreso-hero" aria-hidden="true"><i id="h-barra"></i></div>
+        <a class="desliza" href="#problema" aria-label="Bajar a la siguiente sección"><span>Desliza y mira cómo se llena</span><i></i></a>
+      </div>
+    </section>
+
+    <!-- 2 · Problema con cifras -->
+    <section id="problema" class="seccion problema" data-escena="agobio">
+      <div class="cifras">
+        <div class="cifra" data-valor="85">
+          <p class="cifra-num"><span class="n">0</span><span class="pct">%</span></p>
+          <p class="cifra-texto">se ha encontrado el gimnasio <mark>lleno</mark> en el último mes.</p>
+        </div>
+        <div class="cifra" data-valor="80">
+          <p class="cifra-num"><span class="n">0</span><span class="pct">%</span></p>
+          <p class="cifra-texto">ha tenido que <mark>esperar</mark> por una máquina.</p>
+        </div>
+        <div class="cifra" data-valor="65">
+          <p class="cifra-num"><span class="n">0</span><span class="pct">%</span></p>
+          <p class="cifra-texto">entrena entre las <mark>18:00 y las 21:00</mark>. Todos a la vez.</p>
+        </div>
+        <p class="fuente">Encuesta de AforoYa a 20 personas que entrenan, octubre de 2026.</p>
+      </div>
+    </section>
+
+    <!-- 3 · El giro -->
+    <section id="giro" class="seccion giro" data-escena="giro">
+      <div class="contenido centrado">
+        <p class="giro-previo">Y no es culpa de nadie: nadie ve lo que pasa dentro.</p>
+        <h2 class="titular titular-giro">Por eso hemos creado <span class="logo-texto">AforoYa</span>.</h2>
+        <p class="entradilla">Leemos los tornos de tu gimnasio y mostramos el aforo <mark class="verde">en directo</mark>. Con un semáforo que entiende cualquiera, antes de salir de casa.</p>
+      </div>
+    </section>
+
+    <!-- 4 · Semáforo interactivo -->
+    <section id="semaforo" class="seccion semaforo" data-escena="semaforo">
+      <div class="dos-columnas">
+        <div class="col-texto">
+          <h2 class="titular titular-m">Tres colores.<br>Cero dudas.</h2>
+          <ol class="leyenda" aria-label="Qué significa cada color">
+            <li data-estado="verde"><b>Verde</b><span>menos del 50 %. Entra.</span></li>
+            <li data-estado="ambar"><b>Ámbar</b><span>del 50 al 79 %. Se va llenando.</span></li>
+            <li data-estado="rojo"><b>Rojo</b><span>80 % o más. Mejor luego.</span></li>
+          </ol>
+
+          <div class="widget" role="group" aria-labelledby="w-titulo">
+            <div class="widget-cab">
+              <p id="w-titulo" class="widget-nombre">Gimnasio Centro</p>
+              <span class="en-directo"><i></i>Simulación</span>
+            </div>
+            <div class="widget-cuerpo">
+              <p class="widget-pct"><span id="w-pct">23</span><small>%</small></p>
+              <div class="widget-datos">
+                <p class="widget-estado" id="w-estado">Entra, hay sitio</p>
+                <p class="widget-personas"><span id="w-personas">46</span> de 200 personas</p>
+              </div>
+            </div>
+            <label class="reloj" for="hora">
+              <span>Mueve la hora</span>
+              <output id="hora-txt" for="hora">10:00</output>
+            </label>
+            <input id="hora" type="range" min="6" max="23" step="0.25" value="10" aria-describedby="hora-ayuda">
+            <div class="barras" id="barras" aria-hidden="true"></div>
+            <p id="hora-ayuda" class="nota">Curva de un día entre semana, con datos simulados.</p>
+          </div>
+        </div>
+        <div class="col-hueco" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- 5 · Del torno al semáforo -->
+    <section id="torno" class="seccion torno" data-escena="torno">
+      <div class="contenido">
+        <h2 class="titular titular-m">Del torno al móvil<br>en menos de <mark class="verde">5 segundos</mark>.</h2>
+        <div class="flujo">
+          <div class="paso">
+            <svg class="paso-icono" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="10" width="10" height="30" rx="3"/><path d="M18 22h22"/><path d="M18 28h16"/></svg>
+            <h3>Tu torno cuenta</h3>
+            <p>Cada entrada y cada salida. Sin cámaras, sin apps para tu recepción, sin trabajo extra.</p>
+          </div>
+          <div class="paso">
+            <svg class="paso-icono" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="13"/><path d="M24 15v9l6 4"/></svg>
+            <h3>El motor calcula</h3>
+            <p>Aforo en tiempo real, color del semáforo y previsión de las horas tranquilas.</p>
+          </div>
+          <div class="paso">
+            <svg class="paso-icono" viewBox="0 0 48 48" aria-hidden="true"><rect x="14" y="6" width="20" height="36" rx="5"/><circle cx="24" cy="16" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="24" cy="32" r="3"/></svg>
+            <h3>Tus socios lo ven</h3>
+            <p>En tu web o en tu app. Eligen hora y llegan cuando hay sitio.</p>
+          </div>
+        </div>
+
+        <div class="prueba" role="group" aria-labelledby="prueba-titulo">
+          <div class="prueba-texto">
+            <h3 id="prueba-titulo">Pruébalo: eres el torno.</h3>
+            <p>Cada vez que pulsas entra alguien en un gimnasio de 40 plazas. Mira cómo cambia el semáforo.</p>
+          </div>
+          <div class="prueba-mandos">
+            <button class="boton boton-claro" id="b-entra" type="button">Entra alguien</button>
+            <button class="boton boton-hueco" id="b-sale" type="button">Sale alguien</button>
+          </div>
+          <div class="prueba-medidor" aria-live="polite">
+            <div class="medidor"><div class="medidor-relleno" id="m-relleno"></div></div>
+            <p class="medidor-texto"><b id="m-cuenta">12</b> de 40 · <span id="m-estado">Verde: entra</span> · <span class="latencia" id="m-lat">actualizado al momento</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · La ciudad -->
+    <section id="ciudad" class="seccion ciudad" data-escena="ciudad">
+      <div class="contenido">
+        <p class="contador-ciudad"><i></i><span id="c-total">542</span> entrenando ahora</p>
+        <h2 class="titular titular-m">Tus socios eligen<br>la hora <mark class="verde">tranquila</mark>.</h2>
+        <p class="entradilla">Con el aforo a la vista, la gente reparte sus visitas. Tú dejas de colapsar a las siete y llenas las mañanas que hoy están vacías.</p>
+        <p class="nota">Barrio de ejemplo con gimnasios y datos simulados. Pasa el ratón o toca un bloque.</p>
+      </div>
+      <div class="etiqueta-3d" id="etiqueta" hidden></div>
+    </section>
+
+    <!-- 7 · Dos líneas de negocio -->
+    <section id="para-ti" class="seccion para-ti" data-escena="negocio">
+      <div class="contenido">
+        <h2 class="titular titular-m">Un motor.<br>Dos formas de tenerlo.</h2>
+        <div class="lineas">
+          <article class="linea-negocio">
+            <h3>¿Tienes una cadena con app?</h3>
+            <p class="linea-grande">Te damos el módulo.</p>
+            <p>Un widget y una API que tu equipo integra en tu propia app. Tus socios ven el aforo de cada sede sin salir de tu marca.</p>
+            <ul class="lista">
+              <li>Widget del semáforo listo para integrar</li>
+              <li>API con el aforo de cada sede</li>
+              <li>Licencia mensual con soporte</li>
+            </ul>
+          </article>
+          <article class="linea-negocio">
+            <h3>¿Tienes un gimnasio de barrio?</h3>
+            <p class="linea-grande">Te hacemos la app.</p>
+            <p>Sin equipo técnico y sin líos: tú pones los tornos y nosotros la app con tu nombre, tus colores y el aforo en directo.</p>
+            <ul class="lista">
+              <li>App y web con tu marca</li>
+              <li>Conexión con tus tornos</li>
+              <li>Cuota mensual con soporte y mantenimiento</li>
+            </ul>
+          </article>
+        </div>
+        <p class="privacidad">Contamos entradas, no personas: sin nombres, sin cámaras y sin datos personales.</p>
+      </div>
+    </section>
+
+    <!-- 8 · Vídeo -->
+    <section id="anuncio" class="seccion anuncio" data-escena="anuncio">
+      <div class="dos-columnas inversas">
+        <div class="col-texto">
+          <h2 class="titular titular-m">56 segundos<br>que lo cuentan todo.</h2>
+          <p class="entradilla">Lucía sale de trabajar a las siete y se encuentra la sala llena. Andrés, el dueño, la tiene vacía por la mañana. Con AforoYa ella entrena <mark>sin esperas</mark> y él reparte a su gente todo el día.</p>
+          <button class="boton boton-claro" id="b-sonido" type="button">Verlo entero con sonido</button>
+        </div>
+        <div class="movil">
+          <video id="video" src="media/aforoya-anuncio.mp4" poster="media/poster.jpg" muted autoplay playsinline controls preload="auto" aria-label="Anuncio de AforoYa: Lucía y Andrés"></video>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · Llamada a la acción -->
+    <section id="contacto" class="seccion contacto" data-escena="final">
+      <div class="contenido centrado">
+        <h2 class="titular titular-final">Tu gimnasio,<br><span class="sin-colas">sin colas.</span></h2>
+        <p class="entradilla">Déjanos tu contacto y te enseñamos AforoYa funcionando, con el semáforo de tu propio gimnasio.</p>
+
+        <form class="formulario" id="formulario" novalidate>
+          <div class="campo">
+            <label for="f-gym">Nombre del gimnasio</label>
+            <input id="f-gym" name="gimnasio" type="text" autocomplete="organization" required placeholder="Gimnasio Centro">
+          </div>
+          <div class="campo">
+            <label for="f-mail">Email de contacto</label>
+            <input id="f-mail" name="email" type="email" autocomplete="email" required placeholder="hola@tugimnasio.es">
+          </div>
+          <div class="campo">
+            <label for="f-tipo">Qué tienes</label>
+            <select id="f-tipo" name="tipo">
+              <option value="barrio">Un gimnasio de barrio</option>
+              <option value="cadena">Una cadena con app</option>
+            </select>
+          </div>
+          <button class="boton boton-claro boton-ancho" type="submit">Quiero ver la demo</button>
+          <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+        </form>
+
+        <p class="demo-vivo">¿Lo quieres ver ya? <a href="https://rafaeljaenhernandez-dev.github.io/PROYECTOS3/clase-gimnasio/pantalla.html" target="_blank" rel="noopener">Abre la demo en directo</a> y entra con tu móvil.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p class="pie-marca">AforoYa</p>
+    <p>Rafael Jaén, Iván, Pablo Manzanedo, Jaime, Jorge Mergelina y David · Proyectos III, U-tad, 2026</p>
+    <p class="pie-nota">Proyecto académico. Los aforos de esta página son simulados.</p>
+  </footer>
+
+  <!-- app.bundle.js = app.js + three.js en un solo fichero, para que funcione con doble clic -->
+  <script src="app.bundle.js" defer></script>
+</body>
+</html>
